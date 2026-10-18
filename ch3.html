@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sherry's Math - 國二數學互動教具平台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <style>
+        .block-transition {
+            transition: all 0.5s ease-in-out;
+        }
+        .pop-in {
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen font-sans">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const MainMenu = ({ onSelectChapter }) => {
+            const syllabus = [
+                {
+                    term: "八年級上學期",
+                    chapters: [
+                        { id: "ch1", name: "CH1 乘法公式與多項式", available: true },
+                        { id: "ch2", name: "CH2 平方根與畢氏定理", available: true },
+                        { id: "ch3", name: "CH3 因式分解", available: true },
+                        { id: "ch4", name: "CH4 一元二次方程式", available: false }
+                    ]
+                },
+                {
+                    term: "八年級下學期",
+                    chapters: [
+                        { id: "ch5", name: "CH1 等差數列與級數", available: false },
+                        { id: "ch6", name: "CH2 幾何圖形與尺規作圖", available: false },
+                        { id: "ch7", name: "CH3 三角形的基本性質", available: false },
+                        { id: "ch8", name: "CH4 平行與四邊形", available: false }
+                    ]
+                }
+            ];
+
+            return (
+                <div className="max-w-4xl mx-auto p-8">
+                    <header className="text-center mb-10">
+                        <h1 className="text-4xl font-bold text-blue-800 mb-2">📐 Sherry's Math 互動沙盒</h1>
+                        <p className="text-gray-600">選擇一個單元開始探索數學的視覺奧秘</p>
+                    </header>
+                    
+                    <div className="space-y-8">
+                        {syllabus.map((term, idx) => (
+                            <div key={idx} className="bg-white p-6 rounded-xl shadow-md border-t-4 border-blue-500">
+                                <h2 className="text-2xl font-bold text-gray-800 mb-4">{term.term}</h2>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {term.chapters.map(ch => (
+                                        <button 
+                                            key={ch.id}
+                                            onClick={() => ch.available ? onSelectChapter(ch.id) : alert("這個單元還在開發中喔！")}
+                                            className={`p-4 rounded-lg text-left transition-all duration-300 ${
+                                                ch.available 
+                                                ? "bg-blue-50 hover:bg-blue-100 hover:shadow-md hover:-translate-y-1 border border-blue-200 cursor-pointer" 
+                                                : "bg-gray-50 text-gray-400 border border-gray-200 cursor-not-allowed"
+                                            }`}
+                                        >
+                                            <h3 className={`font-semibold text-lg ${ch.available ? 'text-blue-700' : 'text-gray-400'}`}>
+                                                {ch.name}
+                                            </h3>
+                                            <p className="text-sm mt-1">
+                                                {ch.available ? "👉 點擊進入互動教具" : "🚧 施工中..."}
+                                            </p>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        const Level1 = () => {
+            const [a, setA] = useState(4);
+            const [b, setB] = useState(2);
+            
+            // 使用相對單位讓畫面自適應
+            const scale = 30; // 稍微放大比例讓標示更清晰
+            const totalWidth = (a + b) * scale;
+            const offset = 110; // 加大預留空間，避免文字重疊
+
+            return (
+                <div className="flex flex-col items-center p-4">
+                    <h3 className="text-xl font-bold mb-4 text-gray-700">關卡一：觀察 (a+b) 的正方形</h3>
+                    
+                    <div className="flex flex-col md:flex-row gap-8 items-center w-full max-w-4xl">
+                        {/* 左側：視覺化圖形 */}
+                        <div className="flex-1 flex justify-center border-2 border-dashed border-gray-300 p-8 rounded-lg bg-gray-50 overflow-hidden">
+                            {/* 加入預留空間的相對定位容器 */}
+                            <div className="relative" style={{ width: `${totalWidth + offset}px`, height: `${totalWidth + offset}px` }}>
+                                
+                                {/* 頂部外圍邊長標示 */}
+                                <div className="absolute top-0 block-transition" style={{ left: `${offset}px`, width: `${totalWidth}px`, height: `${offset}px` }}>
+                                    <div className="absolute top-2 w-full flex justify-center">
+                                        <div className="font-bold text-gray-800 whitespace-nowrap text-lg">邊長 (a + b) = {a + b}</div>
+                                    </div>
+                                    <div className="relative w-full h-full">
+                                        {/* a 的標示線 */}
+                                        <div className="absolute bottom-[10px] left-0 border-x-2 border-t-2 border-gray-400 block-transition flex justify-center" style={{ width: `${a*scale}px`, height: '15px' }}>
+                                            <span className="absolute bottom-[20px] text-sm font-bold text-red-500 whitespace-nowrap">a = {a}</span>
+                                        </div>
+                                        {/* b 的標示線 */}
+                                        <div className="absolute bottom-[10px] border-x-2 border-t-2 border-gray-400 block-transition flex justify-center" style={{ left: `${a*scale}px`, width: `${b*scale}px`, height: '15px' }}>
+                                            <span className="absolute bottom-[20px] text-sm font-bold text-blue-500 whitespace-nowrap">b = {b}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* 左側外圍邊長標示 */}
+                                <div className="absolute left-0 block-transition" style={{ top: `${offset}px`, height: `${totalWidth}px`, width: `${offset}px` }}>
+                                    {/* 使用 Flex 容器與固定寬度來安全置中旋轉的文字 */}
+                                    <div className="absolute left-2 top-0 w-[40px] h-full flex items-center justify-center">
+                                        <div className="-rotate-90 font-bold text-gray-800 whitespace-nowrap text-lg">邊長 (a + b) = {a + b}</div>
+                                    </div>
+                                    <div className="relative w-full h-full">
+                                        {/* a 的標示線 */}
+                                        <div className="absolute top-0 right-[10px] border-y-2 border-l-2 border-gray-400 block-transition flex items-center" style={{ height: `${a*scale}px`, width: '15px' }}>
+                                            <span className="absolute right-[25px] text-sm font-bold text-red-500 whitespace-nowrap">a = {a}</span>
+                                        </div>
+                                        {/* b 的標示線 */}
+                                        <div className="absolute right-[10px] border-y-2 border-l-2 border-gray-400 block-transition flex items-center" style={{ top: `${a*scale}px`, height: `${b*scale}px`, width: '15px' }}>
+                                            <span className="absolute right-[25px] text-sm font-bold text-blue-500 whitespace-nowrap">b = {b}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* 大正方形本體 */}
+                                <div 
+                                    style={{ width: `${totalWidth}px`, height: `${totalWidth}px`, top: `${offset}px`, left: `${offset}px` }} 
+                                    className="absolute block-transition shadow-lg"
+                                >
+                                    {/* a^2 (紅) */}
+                                    <div className="absolute top-0 left-0 bg-red-400 flex items-center justify-center text-white font-bold text-xl block-transition border border-white"
+                                         style={{ width: `${a*scale}px`, height: `${a*scale}px` }}>a²</div>
+                                    {/* ab (綠, 右上) */}
+                                    <div className="absolute top-0 right-0 bg-green-400 flex items-center justify-center text-white font-bold text-xl block-transition border border-white"
+                                         style={{ left: `${a*scale}px`, width: `${b*scale}px`, height: `${a*scale}px` }}>ab</div>
+                                    {/* ab (綠, 左下) */}
+                                    <div className="absolute bottom-0 left-0 bg-green-400 flex items-center justify-center text-white font-bold text-xl block-transition border border-white"
+                                         style={{ top: `${a*scale}px`, width: `${a*scale}px`, height: `${b*scale}px` }}>ab</div>
+                                    {/* b^2 (藍) */}
+                                    <div className="absolute bottom-0 right-0 bg-blue-400 flex items-center justify-center text-white font-bold text-xl block-transition border border-white"
+                                         style={{ top: `${a*scale}px`, left: `${a*scale}px`, width: `${b*scale}px`, height: `${b*scale}px` }}>b²</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* 右側：控制面板 */}
+                        <div className="flex-1 bg-white p-6 rounded-lg shadow w-full">
+                            <div className="mb-6">
+                                <label className="block text-gray-700 font-bold mb-2">調整 a 的長度: {a}</label>
+                                <input type="range" min="1" max="5" value={a} onChange={(e) => setA(parseInt(e.target.value))} className="w-full cursor-pointer accent-red-500" />
+                            </div>
+                            <div className="mb-6">
+                                <label className="block text-gray-700 font-bold mb-2">調整 b 的長度: {b}</label>
+                                <input type="range" min="1" max="5" value={b} onChange={(e) => setB(parseInt(e.target.value))} className="w-full cursor-pointer accent-blue-500" />
+                            </div>
+                            <div className="bg-blue-50 p-4 rounded text-sm text-blue-800 leading-relaxed">
+                                💡 觀察左圖，無論你怎麼拉動滑桿，一個邊長為 (a+b) 的大正方形，永遠會被切成四塊：<br/>
+                                <span className="font-bold text-red-600">一個 a²</span>、<span className="font-bold text-blue-600">一個 b²</span>、以及<span className="font-bold text-green-600">兩個 ab</span>！
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const Level2 = () => {
+            const [blocks, setBlocks] = useState({ a2: false, b2: false, ab1: false, ab2: false });
+            const [step, setStep] = useState(0);
+            
+            const handlePlaceFirstTwo = () => {
+                setBlocks({ ...blocks, a2: true, b2: true });
+                setStep(1);
+            };
+
+            const handlePlaceLastTwo = () => {
+                setBlocks({ a2: true, b2: true, ab1: true, ab2: true });
+                setStep(2);
+            };
+
+            const reset = () => {
+                setBlocks({ a2: false, b2: false, ab1: false, ab2: false });
+                setStep(0);
+            };
+
+            return (
+                <div className="flex flex-col items-center p-4">
+                    <h3 className="text-xl font-bold mb-4 text-gray-700">關卡二：(3+2) 的正方形陷阱</h3>
+                    <div className="flex flex-col md:flex-row gap-8 w-full max-w-4xl">
+                        <div className="flex-1 flex justify-center bg-gray-50 border-2 border-gray-200 p-8 rounded-lg">
+                            <div className="relative w-[250px] h-[250px] border-4 border-dashed border-gray-400 bg-white">
+                                <div className="absolute -top-8 w-full text-center font-bold text-gray-600">目標：邊長 5 (即 3+2)</div>
+                                <div className={`absolute top-0 left-0 w-[150px] h-[150px] bg-red-400 border border-white flex items-center justify-center text-white font-bold text-xl block-transition ${blocks.a2 ? 'opacity-100 scale-100' : 'opacity-0 scale-50'}`}>3²</div>
+                                <div className={`absolute bottom-0 right-0 w-[100px] h-[100px] bg-blue-400 border border-white flex items-center justify-center text-white font-bold text-xl block-transition ${blocks.b2 ? 'opacity-100 scale-100' : 'opacity-0 scale-50'}`}>2²</div>
+                                <div className={`absolute top-0 right-0 w-[100px] h-[150px] bg-green-400 border border-white flex items-center justify-center text-white font-bold text-xl block-transition ${blocks.ab1 ? 'opacity-100 scale-100' : 'opacity-0 scale-50'}`}>3×2</div>
+                                <div className={`absolute bottom-0 left-0 w-[150px] h-[100px] bg-green-400 border border-white flex items-center justify-center text-white font-bold text-xl block-transition ${blocks.ab2 ? 'opacity-100 scale-100' : 'opacity-0 scale-50'}`}>3×2</div>
+                            </div>
+                        </div>
+
+                        <div className="flex-1 bg-white p-6 rounded-lg shadow">
+                            <div className="mb-6">
+                                <p className="text-gray-700 font-bold mb-4">題目：請用積木拼出 (3+2)² 的面積</p>
+                                
+                                {step === 0 && (
+                                    <div className="space-y-4 pop-in">
+                                        <p className="text-sm text-gray-600">很多人以為 (3+2)² 就是 3² + 2²，我們來試試看這樣對不對？</p>
+                                        <button onClick={handlePlaceFirstTwo} className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded shadow">
+                                            放入 3² 和 2² 積木
+                                        </button>
+                                    </div>
+                                )}
+
+                                {step === 1 && (
+                                    <div className="space-y-4 pop-in">
+                                        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+                                            <p className="text-yellow-800 font-bold">哎呀！發現了嗎？</p>
+                                            <p className="text-sm text-yellow-700 mt-1">正方形破了兩個大洞！原來 (3+2)² 絕對不只等於 3² + 2²！</p>
+                                        </div>
+                                        <button onClick={handlePlaceLastTwo} className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded shadow animate-pulse">
+                                            呼叫救援：補上缺少的兩塊積木
+                                        </button>
+                                    </div>
+                                )}
+
+                                {step === 2 && (
+                                    <div className="space-y-4 pop-in">
+                                        <div className="bg-green-50 border-l-4 border-green-400 p-4">
+                                            <p className="text-green-800 font-bold text-lg">✨ 完美拼滿！</p>
+                                            <p className="text-sm text-green-700 mt-2">所以正確的公式是：<br/>
+                                                <span className="font-mono text-base">(3+2)² = 3² + 2×(3×2) + 2²</span>
+                                            </p>
+                                        </div>
+                                        <button onClick={reset} className="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded">
+                                            再來一次
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const Chapter1App = ({ onBack }) => {
+            const [activeTab, setActiveTab] = useState(1);
+
+            return (
+                <div className="max-w-4xl mx-auto p-4 md:p-8">
+                    <div className="flex items-center justify-between mb-6">
+                        <button onClick={onBack} className="text-blue-600 hover:text-blue-800 flex items-center font-semibold transition-colors">
+                            <span>← 返回目錄</span>
+                        </button>
+                        <h2 className="text-2xl font-bold text-gray-800">CH1 乘法公式與多項式</h2>
+                        <div className="w-20"></div>
+                    </div>
+
+                    <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
+                        <div className="flex border-b border-gray-200 bg-gray-50 overflow-x-auto">
+                            {[
+                                { id: 1, name: '關卡一：觀察積木' }, 
+                                { id: 2, name: '關卡二：面積陷阱' }
+                            ].map(tab => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveTab(tab.id)}
+                                    className={`flex-1 py-4 px-2 text-center font-bold text-sm md:text-lg transition-colors whitespace-nowrap ${
+                                        activeTab === tab.id 
+                                        ? 'bg-white text-blue-600 border-b-4 border-blue-600' 
+                                        : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700'
+                                    }`}
+                                >
+                                    {tab.name}
+                                </button>
+                            ))}
+                        </div>
+
+                        <div className="p-6 bg-white min-h-[400px]">
+                            {activeTab === 1 && <Level1 />}
+                            {activeTab === 2 && <Level2 />}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const Chapter2Level1 = () => {
+            const [isTransferred, setIsTransferred] = useState(false);
+            const [triple, setTriple] = useState({ a: 3, b: 4, c: 5 });
+
+            const { a, b, c } = triple;
+            
+            // 動態比例縮放：確保最大組(5-12-13)的圖形也能完整塞進畫布
+            const targetHypotenusePx = 175; 
+            const scale = targetHypotenusePx / c; 
+            
+            const cx = 200, cy = 260; 
+            const theta = Math.atan2(a, b) * 180 / Math.PI; 
+
+            // 產生 C 正方形 (斜邊) 的空位陣列
+            const destSlots = Array.from({ length: c * c }).map((_, idx) => {
+                return { col: idx % c, row: Math.floor(idx / c) };
+            });
+
+            // 產生 A 正方形 (紅) 的小方塊
+            const redBlocks = Array.from({ length: a * a }).map((_, idx) => {
+                return { 
+                    id: `red-${idx}`, 
+                    startX: cx - a * scale + (idx % a) * scale, 
+                    startY: cy - a * scale + Math.floor(idx / a) * scale, 
+                    dest: destSlots[idx] 
+                };
+            });
+
+            // 產生 B 正方形 (藍) 的小方塊
+            const blueBlocks = Array.from({ length: b * b }).map((_, idx) => {
+                return { 
+                    id: `blue-${idx}`, 
+                    startX: cx + (idx % b) * scale, 
+                    startY: cy + Math.floor(idx / b) * scale, 
+                    dest: destSlots[idx + a * a] 
+                };
+            });
+
+            const handleTripleChange = (newTriple) => {
+                setIsTransferred(false); // 切換時歸位
+                setTimeout(() => setTriple(newTriple), 300);
+            };
+
+            return (
+                <div className="flex flex-col items-center p-4">
+                    <h3 className="text-xl font-bold mb-4 text-gray-700">關卡一：面積方塊大轉移</h3>
+                    
+                    <div className="flex flex-col md:flex-row gap-8 items-center w-full max-w-4xl">
+                        {/* 左側：SVG 視覺化 */}
+                        <div className="flex-1 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 flex justify-center overflow-hidden py-8">
+                            <svg viewBox="0 0 550 500" className="w-full max-w-lg h-auto">
+                                
+                                {/* 繪製斜邊 C 的目標空位框 (紫虛線) */}
+                                {destSlots.map((slot, idx) => (
+                                    <rect 
+                                        key={`slot-${idx}`}
+                                        width={scale} height={scale} 
+                                        fill="none" stroke="#d8b4fe" strokeWidth="1" strokeDasharray="2 2"
+                                        style={{ 
+                                            transform: `translate(${cx}px, ${cy - a*scale}px) rotate(${theta}deg) translate(${slot.col * scale}px, ${-slot.row * scale - scale}px)` 
+                                        }}
+                                    />
+                                ))}
+
+                                {/* A與B正方形外框 (虛線) */}
+                                <rect x={cx - a*scale} y={cy - a*scale} width={a*scale} height={a*scale} fill="none" stroke="#fca5a5" strokeWidth="2" strokeDasharray="4 4"/>
+                                <rect x={cx} y={cy} width={b*scale} height={b*scale} fill="none" stroke="#93c5fd" strokeWidth="2" strokeDasharray="4 4"/>
+                                
+                                {/* 中央的直角三角形 */}
+                                <polygon points={`${cx},${cy} ${cx},${cy - a*scale} ${cx + b*scale},${cy}`} fill="#fff" stroke="#374151" strokeWidth="3" />
+                                <rect x={cx} y={cy-10} width="10" height="10" fill="none" stroke="#374151" strokeWidth="2"/>
+                                
+                                {/* 標示文字 */}
+                                <text x={cx - a*scale/2} y={cy - a*scale - 15} textAnchor="middle" fill="#ef4444" className="font-bold">a² ({a*a}塊)</text>
+                                <text x={cx + b*scale/2} y={cy + b*scale + 25} textAnchor="middle" fill="#3b82f6" className="font-bold">b² ({b*b}塊)</text>
+                                
+                                {/* C 正方形文字標示 */}
+                                <text 
+                                    textAnchor="middle" fill="#a855f7" className="font-bold block-transition"
+                                    style={{ 
+                                        transform: `translate(${cx}px, ${cy - a*scale}px) rotate(${theta}deg) translate(${(c/2) * scale}px, ${(-c/2) * scale + 6}px)`,
+                                        opacity: isTransferred ? 1 : 0.4
+                                    }}
+                                >
+                                    c² ({c*c}塊)
+                                </text>
+
+                                {/* 動態紅方塊 */}
+                                {redBlocks.map(blk => (
+                                    <rect 
+                                        key={blk.id} width={scale} height={scale} fill="#f87171" stroke="#fff" strokeWidth="1" 
+                                        className="block-transition"
+                                        style={{ 
+                                            transform: isTransferred 
+                                                ? `translate(${cx}px, ${cy - a*scale}px) rotate(${theta}deg) translate(${blk.dest.col * scale}px, ${-blk.dest.row * scale - scale}px)` 
+                                                : `translate(${blk.startX}px, ${blk.startY}px) rotate(0deg) translate(0px, 0px)` 
+                                        }}
+                                    />
+                                ))}
+
+                                {/* 動態藍方塊 */}
+                                {blueBlocks.map(blk => (
+                                    <rect 
+                                        key={blk.id} width={scale} height={scale} fill="#60a5fa" stroke="#fff" strokeWidth="1"
+                                        className="block-transition" 
+                                        style={{ 
+                                            transform: isTransferred 
+                                                ? `translate(${cx}px, ${cy - a*scale}px) rotate(${theta}deg) translate(${blk.dest.col * scale}px, ${-blk.dest.row * scale - scale}px)` 
+                                                : `translate(${blk.startX}px, ${blk.startY}px) rotate(0deg) translate(0px, 0px)` 
+                                        }}
+                                    />
+                                ))}
+                            </svg>
+                        </div>
+
+                        {/* 右側：控制面板 */}
+                        <div className="flex-1 bg-white p-6 rounded-lg shadow w-full">
+                            <div className="mb-6">
+                                <label className="block text-gray-700 font-bold mb-3">切換其他直角三角形測試：</label>
+                                <div className="flex flex-wrap gap-2">
+                                    {[
+                                        { a: 3, b: 4, c: 5 },
+                                        { a: 6, b: 8, c: 10 },
+                                        { a: 5, b: 12, c: 13 }
+                                    ].map(t => (
+                                        <button 
+                                            key={`${t.a}-${t.b}-${t.c}`}
+                                            onClick={() => handleTripleChange(t)}
+                                            className={`px-4 py-2 rounded-full font-bold border-2 transition-colors ${a === t.a && b === t.b ? 'bg-purple-100 border-purple-500 text-purple-700' : 'bg-white border-gray-300 text-gray-500 hover:border-purple-300 hover:text-purple-600'}`}
+                                        >
+                                            {t.a}-{t.b}-{t.c}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <p className="text-gray-600 mb-6 font-medium leading-relaxed">
+                                觀察這個 <strong>{a}-{b}-{c}</strong> 的直角三角形。我們把旁邊的 <span className="text-red-500 font-bold">a²</span> 與 <span className="text-blue-500 font-bold">b²</span> 切成了一格一格的小方塊。<br/><br/>
+                                在腦中想像一下：如果把它們全部搬到斜邊上，會發生什麼事？
+                            </p>
+                            
+                            <button 
+                                onClick={() => setIsTransferred(!isTransferred)} 
+                                className={`w-full py-4 px-4 rounded-xl font-bold text-lg text-white shadow-lg transition-transform active:scale-95 ${isTransferred ? 'bg-gray-500 hover:bg-gray-600' : 'bg-purple-600 hover:bg-purple-700'}`}
+                            >
+                                {isTransferred ? "🔄 歸位方塊" : "✨ 開始搬運方塊入庫"}
+                            </button>
+
+                            <div className={`mt-6 p-5 rounded-lg text-base leading-relaxed border block-transition ${isTransferred ? 'bg-purple-50 border-purple-200 text-purple-900' : 'bg-gray-50 border-gray-200 text-gray-400'}`}>
+                                💡 <strong>Aha Moment！</strong><br/>
+                                <span className={isTransferred ? 'text-red-600 font-bold' : ''}>{a*a} 塊</span>加上 <span className={isTransferred ? 'text-blue-600 font-bold' : ''}>{b*b} 塊</span>，飛過去之後竟然「剛剛好」填滿了斜邊的 <span className={isTransferred ? 'text-purple-600 font-bold' : ''}>{c*c} 個空位</span>！<br/><br/>
+                                這就是 <strong>a² + b² = c²</strong> 最直觀的面積證據！
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const Chapter2Level2 = () => {
+            const [step, setStep] = useState(0); 
+            const [feedback, setFeedback] = useState("");
+            
+            const questions = [
+                { angle: 0, desc: "這是一般的直角三角形" },
+                { angle: -60, desc: "如果它翹起來了呢？" },
+                { angle: 135, desc: "如果它倒頭栽了呢？" }
+            ];
+            
+            const currentQ = questions[step];
+
+            const s = 30, a = 3, b = 4;
+            const cx = 200, cy = 200; 
+            const sqA = `${cx},${cy} ${cx},${cy-a*s} ${cx-a*s},${cy-a*s} ${cx-a*s},${cy}`;
+            const sqB = `${cx},${cy} ${cx+b*s},${cy} ${cx+b*s},${cy+b*s} ${cx},${cy+b*s}`;
+            const sqC = `${cx},${cy-a*s} ${cx+b*s},${cy} ${cx+b*s+a*s},${cy-b*s} ${cx+a*s},${cy-a*s-b*s}`;
+
+            const handleSquareClick = (type) => {
+                if (type === 'C') {
+                    setFeedback("✅ 答對了！斜邊永遠都在直角的正對面喔！");
+                    setTimeout(() => {
+                        if(step < 2) {
+                            setStep(step + 1);
+                            setFeedback("");
+                        } else {
+                            setFeedback("🎉 恭喜通關！你已經不會被旋轉騙倒了！");
+                        }
+                    }, 2500);
+                } else {
+                    setFeedback("❌ 不對喔！找找看直角「正對面」的那一條邊！");
+                }
+            };
+
+            return (
+                <div className="flex flex-col items-center p-4">
+                    <h3 className="text-xl font-bold mb-2 text-gray-700">關卡二：旋轉橡皮筋</h3>
+                    <p className="mb-4 text-gray-600 text-center">直角三角形常常會轉來轉去騙人。<br/>請點擊下方圖形中 <strong>「斜邊 (最長邊) 對應的面積」</strong>！</p>
+                    
+                    <div className="w-full max-w-xl bg-gray-50 border-2 border-gray-200 rounded-xl p-4 flex flex-col items-center relative overflow-hidden h-[450px]">
+                        <div className="text-sm font-bold text-gray-500 mb-2">{currentQ.desc}</div>
+                        
+                        {/* 修正：將 viewBox 擴張到極致，並改為 w-full 自適應，確保絕不切邊 */}
+                        <svg viewBox="-200 -200 800 800" className="w-full h-auto drop-shadow-lg block-transition">
+                            <g transform={`rotate(${currentQ.angle}, ${cx}, ${cy})`} className="block-transition cursor-pointer">
+                                <polygon points={sqA} fill="#fecaca" stroke="#ef4444" strokeWidth="2" 
+                                    className="hover:fill-red-400 transition-colors" onClick={() => handleSquareClick('A')} />
+                                <polygon points={sqB} fill="#bfdbfe" stroke="#3b82f6" strokeWidth="2" 
+                                    className="hover:fill-blue-400 transition-colors" onClick={() => handleSquareClick('B')} />
+                                <polygon points={sqC} fill="#e9d5ff" stroke="#8b5cf6" strokeWidth="2" 
+                                    className="hover:fill-purple-400 transition-colors" onClick={() => handleSquareClick('C')} />
+                                
+                                <polygon points={`${cx},${cy-a*s} ${cx+b*s},${cy} ${cx},${cy}`} fill="#fff" stroke="#374151" strokeWidth="3" pointerEvents="none"/>
+                                <rect x={cx} y={cy-12} width="12" height="12" fill="none" stroke="#374151" strokeWidth="2" pointerEvents="none"/>
+                            </g>
+                        </svg>
+
+                        {/* 修正：絕對定位安全置中，確保不會被切斷 */}
+                        {feedback && (
+                            <div className={`absolute bottom-4 left-0 right-0 mx-auto w-11/12 p-3 rounded-lg font-bold text-center shadow-lg pop-in z-10 ${feedback.includes('✅') || feedback.includes('🎉') ? 'bg-green-100 text-green-800 border border-green-300' : 'bg-red-100 text-red-800 border border-red-300'}`}>
+                                {feedback}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        const Chapter2Level3 = () => {
+            const [side, setSide] = useState(1.0);
+            const [showHint, setShowHint] = useState(false);
+            const [isSolved, setIsSolved] = useState(false);
+
+            const targetArea = 10;
+            const currentArea = (side * side).toFixed(2);
+            
+            const scale = 40;
+            const targetSidePx = Math.sqrt(targetArea) * scale;
+            const currentSidePx = side * scale;
+
+            const handleSolve = () => {
+                setSide(Math.sqrt(10));
+                setIsSolved(true);
+            };
+
+            return (
+                <div className="flex flex-col items-center p-4">
+                    <h3 className="text-xl font-bold mb-2 text-gray-700">關卡三：解開根號封印</h3>
+                    <p className="mb-6 text-gray-600">如果現在有一個水箱，面積剛好是 <strong>10</strong>，那它的邊長應該拉到多少？</p>
+                    
+                    <div className="flex flex-col md:flex-row gap-8 items-center w-full max-w-3xl">
+                        <div className="flex-1 bg-gray-50 border-2 border-gray-200 rounded-xl p-8 flex justify-center items-center h-[300px] relative">
+                            <div className="absolute border-4 border-dashed border-gray-400 rounded-sm flex items-center justify-center"
+                                 style={{ width: `${targetSidePx}px`, height: `${targetSidePx}px` }}>
+                                <span className="text-gray-400 font-bold text-2xl opacity-50 z-0">目標 10</span>
+                            </div>
+
+                            <div className="absolute bg-blue-500 border-2 border-white shadow-lg flex items-center justify-center opacity-80 block-transition z-10"
+                                 style={{ width: `${currentSidePx}px`, height: `${currentSidePx}px` }}>
+                                <span className="text-white font-bold text-xl drop-shadow-md">
+                                    {isSolved ? '10' : currentArea}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div className="flex-1 w-full flex flex-col justify-center">
+                            <div className="bg-white p-6 rounded-lg shadow-md mb-4">
+                                <label className="block text-gray-700 font-bold mb-2 text-lg">
+                                    測試邊長: <span className="text-blue-600">{isSolved ? '√10 (約 3.162)' : side.toFixed(1)}</span>
+                                </label>
+                                <input 
+                                    type="range" min="1" max="5" step="0.1" 
+                                    value={side} 
+                                    onChange={(e) => {
+                                        setSide(parseFloat(e.target.value));
+                                        setIsSolved(false);
+                                        if(parseFloat(e.target.value) >= 3.1 && parseFloat(e.target.value) <= 3.2) {
+                                            setShowHint(true);
+                                        } else {
+                                            setShowHint(false);
+                                        }
+                                    }} 
+                                    className="w-full cursor-pointer accent-blue-500 mb-4"
+                                    disabled={isSolved}
+                                />
+                                <div className="text-center bg-gray-100 p-3 rounded font-mono text-lg">
+                                    面積 = {isSolved ? '√10' : side.toFixed(1)} × {isSolved ? '√10' : side.toFixed(1)} <br/>
+                                    <span className="font-bold text-red-600">= {isSolved ? '10' : currentArea}</span>
+                                </div>
+                            </div>
+
+                            {showHint && !isSolved && (
+                                <div className="pop-in bg-yellow-100 border border-yellow-300 p-4 rounded-lg text-yellow-800 text-sm mb-4 font-bold">
+                                    發現了嗎？3.1 的平方是 9.61，3.2 的平方是 10.24。你永遠找不到一個「剛剛好」的整數或小數！
+                                </div>
+                            )}
+
+                            {(!isSolved) && (
+                                <button onClick={handleSolve} className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-4 rounded-lg shadow-md transition-transform active:scale-95 pop-in">
+                                    🪄 點我召喚「根號法寶」
+                                </button>
+                            )}
+
+                            {isSolved && (
+                                <div className="pop-in bg-green-100 border border-green-400 p-4 rounded-lg text-green-800 font-bold">
+                                    ✨ 完美重合！<br/>
+                                    數學家為了解決這個煩惱，發明了根號。<br/>
+                                    <span className="text-xl">√10</span> 其實不可怕，它就只是代表一個「面積為 10 的正方形，它的邊長」而已喔！
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const Chapter2App = ({ onBack }) => {
+            const [activeTab, setActiveTab] = useState(1);
+
+            return (
+                <div className="max-w-4xl mx-auto p-4 md:p-8">
+                    <div className="flex items-center justify-between mb-6">
+                        <button onClick={onBack} className="text-blue-600 hover:text-blue-800 flex items-center font-semibold transition-colors">
+                            <span>← 返回目錄</span>
+                        </button>
+                        <h2 className="text-2xl font-bold text-gray-800">CH2 畢氏定理：水箱與面積</h2>
+                        <div className="w-20"></div>
+                    </div>
+
+                    <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
+                        <div className="flex border-b border-gray-200 bg-gray-50 overflow-x-auto">
+                            {[
+                                { id: 1, name: '關卡一：面積大轉移' }, 
+                                { id: 2, name: '關卡二：旋轉橡皮筋' }, 
+                                { id: 3, name: '關卡三：解開根號封印' }
+                            ].map(tab => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveTab(tab.id)}
+                                    className={`flex-1 py-4 px-2 text-center font-bold text-sm md:text-lg transition-colors whitespace-nowrap ${
+                                        activeTab === tab.id 
+                                        ? 'bg-white text-blue-600 border-b-4 border-blue-600' 
+                                        : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700'
+                                    }`}
+                                >
+                                    {tab.name}
+                                </button>
+                            ))}
+                        </div>
+
+                        <div className="p-6 bg-white min-h-[400px]">
+                            {activeTab === 1 && <Chapter2Level1 />}
+                            {activeTab === 2 && <Chapter2Level2 />}
+                            {activeTab === 3 && <Chapter2Level3 />}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const Chapter3Level1 = () => {
+            const questions = [
+                { b: 7, c: 10, text: "x² + 7x + 10" },
+                { b: 5, c: 6, text: "x² + 5x + 6" },
+                { b: 8, c: 15, text: "x² + 8x + 15" }
+            ];
+            const [qIndex, setQIndex] = useState(0);
+            const q = questions[qIndex];
+
+            const [m, setM] = useState(1); 
+            const n = q.b - m; 
+            
+            const isSuccess = (m * n === q.c);
+
+            // 當切換題目時，重置滑桿
+            useEffect(() => {
+                setM(1);
+            }, [qIndex]);
+
+            // 1. 縮小視覺尺寸設定，確保不超出預覽視窗
+            const xSize = 110; // 原本是 140
+            const unitSize = 28; // 原本是 35
+
+            return (
+                <div className="flex flex-col items-center p-2 md:p-4">
+                    <h3 className="text-xl font-bold mb-2 text-gray-700">關卡一：十字交乘的幾何真面目</h3>
+                    
+                    {/* 題庫切換器 */}
+                    <div className="flex gap-2 mb-4">
+                        {questions.map((item, idx) => (
+                            <button 
+                                key={idx}
+                                onClick={() => setQIndex(idx)}
+                                className={`px-4 py-2 rounded-full font-bold border-2 transition-colors ${qIndex === idx ? 'bg-blue-100 border-blue-500 text-blue-700' : 'bg-white border-gray-300 text-gray-500 hover:border-blue-300 hover:text-blue-600'}`}
+                            >
+                                {item.text}
+                            </button>
+                        ))}
+                    </div>
+
+                    <p className="mb-4 text-gray-600 text-center font-medium text-sm md:text-base">
+                        目標：將 <span className="font-mono text-blue-600 font-bold text-lg">{q.text}</span> 拼成一個完美的長方形！<br/>
+                        請將 {q.b} 個 x 積木，分配到右邊與下面。
+                    </p>
+                    
+                    {/* 2. 關鍵修改：提早在 md 斷點並排 (md:flex-row)，並改為 items-start 節省垂直空間 */}
+                    <div className="flex flex-col md:flex-row gap-6 items-start w-full max-w-5xl">
+                        {/* 左側：面積視覺化 */}
+                        <div className="flex-1 flex justify-center border-2 border-dashed border-gray-300 p-4 rounded-lg bg-gray-50 overflow-hidden w-full">
+                            <div className="relative" style={{ width: `${xSize + q.b * unitSize}px`, height: `${xSize + q.b * unitSize}px` }}>
+                                
+                                {/* 核心 x^2 */}
+                                <div className="absolute top-0 left-0 bg-blue-400 border border-white flex items-center justify-center text-white font-bold text-2xl shadow-sm z-10 block-transition"
+                                     style={{ width: `${xSize}px`, height: `${xSize}px` }}>x²</div>
+                                
+                                {/* 右側的 m 個 x */}
+                                <div className="absolute top-0 flex block-transition z-10" style={{ left: `${xSize}px`, height: `${xSize}px` }}>
+                                    {Array.from({ length: m }).map((_, i) => (
+                                        <div key={`rx-${i}`} className="bg-green-400 border border-white flex items-center justify-center text-white font-bold"
+                                             style={{ width: `${unitSize}px`, height: `${xSize}px` }}>x</div>
+                                    ))}
+                                </div>
+
+                                {/* 下方的 n 個 x */}
+                                <div className="absolute left-0 flex flex-col block-transition z-10" style={{ top: `${xSize}px`, width: `${xSize}px` }}>
+                                    {Array.from({ length: n }).map((_, i) => (
+                                        <div key={`bx-${i}`} className="bg-green-400 border border-white flex items-center justify-center text-white font-bold"
+                                             style={{ width: `${xSize}px`, height: `${unitSize}px` }}>x</div>
+                                    ))}
+                                </div>
+
+                                {/* 右下角的空缺 (m * n 塊單位面積) */}
+                                <div className="absolute block-transition z-0 bg-gray-200 border-2 border-gray-300 border-dashed overflow-hidden"
+                                     style={{ top: `${xSize}px`, left: `${xSize}px`, width: `${m * unitSize}px`, height: `${n * unitSize}px` }}>
+                                     {/* 如果成功，使用 Grid 完美填滿常數方塊 */}
+                                     {isSuccess ? (
+                                         <div className="w-full h-full grid" style={{ gridTemplateColumns: `repeat(${m}, 1fr)` }}>
+                                             {Array.from({ length: m * n }).map((_, i) => (
+                                                 <div key={`c-${i}`} className="bg-yellow-400 border border-white pop-in flex items-center justify-center text-yellow-800 text-xs font-bold w-full h-full">
+                                                     1
+                                                 </div>
+                                             ))}
+                                         </div>
+                                     ) : (
+                                         <div className="w-full h-full flex items-center justify-center text-gray-400 font-bold text-sm">
+                                             缺 {m * n} 塊
+                                         </div>
+                                     )}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* 右側：控制面板 (3. 縮減上下間距與字體，讓畫面更緊湊) */}
+                        <div className="flex-1 bg-white p-4 md:p-5 rounded-lg shadow w-full">
+                            <div className="mb-4">
+                                <label className="block text-gray-700 font-bold mb-3 text-sm md:text-base">
+                                    分配 <span className="text-green-600">{q.b} 個 x</span> 的位置：
+                                </label>
+                                <div className="flex items-center gap-3 mb-3">
+                                    <span className="w-20 text-right text-gray-600 font-bold text-sm">放右邊：{m}</span>
+                                    <input type="range" min="1" max={q.b - 1} value={m} onChange={(e) => setM(parseInt(e.target.value))} className="flex-1 cursor-pointer accent-green-500" />
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <span className="w-20 text-right text-gray-600 font-bold text-sm">放下面：{n}</span>
+                                    <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                        <div className="h-full bg-green-300 block-transition" style={{ width: `${(n/q.b)*100}%` }}></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="bg-gray-50 p-3 rounded-xl border border-gray-200 mb-4 font-mono text-sm md:text-base text-center">
+                                右下角的缺口面積 = {m} × {n} = <span className={isSuccess ? "text-green-600 font-bold text-xl" : "text-red-500 font-bold text-xl"}>{m * n}</span>
+                            </div>
+
+                            {isSuccess ? (
+                                <div className="bg-green-50 border border-green-300 p-3 rounded-lg pop-in">
+                                    <p className="text-green-800 font-bold text-base mb-1">🎉 完美填滿 {q.c} 塊！</p>
+                                    <p className="text-green-700 text-xs md:text-sm">所以 <span className="font-mono font-bold">{q.text}</span> 分解後，長寬為：<br/><span className="font-mono font-bold text-sm bg-green-200 px-2 py-1 mt-1 inline-block rounded">(x + {m})(x + {n})</span></p>
+                                </div>
+                            ) : (
+                                <div className="bg-yellow-50 border border-yellow-300 p-3 rounded-lg">
+                                    <p className="text-yellow-800 font-bold text-xs md:text-sm">💡 缺口面積必須剛好等於常數項 ({q.c})，才能拼成一個完整的長方形喔！</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const Chapter3Level2 = () => {
+            const questions = [
+                { b: -1, c: -6, text: "x² - x - 6" },
+                { b: -5, c: 4, text: "x² - 5x + 4" },
+                { b: 1, c: -12, text: "x² + x - 12" }
+            ];
+            const [qIndex, setQIndex] = useState(0);
+            const q = questions[qIndex];
+
+            const [p, setP] = useState(0);
+            const [qVal, setQVal] = useState(0);
+
+            useEffect(() => {
+                setP(0);
+                setQVal(0);
+            }, [qIndex]);
+
+            const currentB = p + qVal;
+            const currentC = p * qVal;
+            const isSolved = (currentB === q.b && currentC === q.c);
+
+            const adjustValue = (setter, val, delta) => {
+                setter(val + delta);
+            };
+
+            return (
+                <div className="flex flex-col items-center p-4">
+                    <h3 className="text-xl font-bold mb-4 text-gray-700">關卡二：數位黑板（真實十字還原）</h3>
+                    
+                    {/* 題庫切換器 */}
+                    <div className="flex gap-2 mb-6">
+                        {questions.map((item, idx) => (
+                            <button 
+                                key={idx}
+                                onClick={() => setQIndex(idx)}
+                                className={`px-4 py-2 rounded-full font-bold border-2 transition-colors ${qIndex === idx ? 'bg-purple-100 border-purple-500 text-purple-700' : 'bg-white border-gray-300 text-gray-500 hover:border-purple-300 hover:text-purple-600'}`}
+                            >
+                                {item.text}
+                            </button>
+                        ))}
+                    </div>
+
+                    <p className="mb-6 text-gray-600 text-center font-medium">
+                        這次有負數了！請模仿在紙上算數學的直覺：<br/>
+                        找出兩個數字，讓它們<span className="text-red-500 font-bold">直的相乘</span>等於常數項，<span className="text-blue-500 font-bold">交叉相乘</span>的和等於一次項。<br/>
+                        目標：<span className="font-mono text-purple-600 font-bold text-xl tracking-widest">{q.text}</span>
+                    </p>
+
+                    <div className="flex flex-col md:flex-row gap-8 items-center w-full max-w-5xl">
+                        
+                        {/* 左側：真實的十字交乘黑板 */}
+                        <div className="flex-1 bg-gray-800 p-8 rounded-2xl shadow-inner border-8 border-gray-700 relative w-full flex flex-col items-center">
+                            
+                            <div className="relative w-64 h-64 flex flex-col justify-between z-10 font-mono text-2xl">
+                                
+                                {/* 上排 */}
+                                <div className="flex justify-between items-center w-full px-4">
+                                    <div className="text-white font-bold">x</div>
+                                    <div className="flex items-center bg-gray-700 rounded px-2">
+                                        <button onClick={() => adjustValue(setP, p, -1)} className="text-gray-400 hover:text-white px-2">-</button>
+                                        <div className={`w-12 text-center font-bold ${p > 0 ? 'text-green-400' : p < 0 ? 'text-red-400' : 'text-white'}`}>
+                                            {p > 0 ? `+${p}` : p}
+                                        </div>
+                                        <button onClick={() => adjustValue(setP, p, 1)} className="text-gray-400 hover:text-white px-2">+</button>
+                                    </div>
+                                </div>
+
+                                {/* 交叉線 */}
+                                <svg className="absolute top-0 left-0 w-full h-full pointer-events-none" style={{ zIndex: -1 }}>
+                                    {/* 直的乘法線 (常數項) */}
+                                    <line x1="85%" y1="25%" x2="85%" y2="75%" stroke="#ef4444" strokeWidth="2" strokeDasharray="4 4" className={currentC === q.c ? "opacity-100" : "opacity-30"} />
+                                    {/* 交叉乘法線 */}
+                                    <line x1="15%" y1="20%" x2="85%" y2="80%" stroke="#3b82f6" strokeWidth="3" opacity="0.6" />
+                                    <line x1="15%" y1="80%" x2="85%" y2="20%" stroke="#3b82f6" strokeWidth="3" opacity="0.6" />
+                                </svg>
+
+                                {/* 下排 */}
+                                <div className="flex justify-between items-center w-full px-4">
+                                    <div className="text-white font-bold">x</div>
+                                    <div className="flex items-center bg-gray-700 rounded px-2">
+                                        <button onClick={() => adjustValue(setQVal, qVal, -1)} className="text-gray-400 hover:text-white px-2">-</button>
+                                        <div className={`w-12 text-center font-bold ${qVal > 0 ? 'text-green-400' : qVal < 0 ? 'text-red-400' : 'text-white'}`}>
+                                            {qVal > 0 ? `+${qVal}` : qVal}
+                                        </div>
+                                        <button onClick={() => adjustValue(setQVal, qVal, 1)} className="text-gray-400 hover:text-white px-2">+</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* 右側：計算過程反饋 */}
+                        <div className="flex-1 w-full space-y-4">
+                            <div className="bg-white p-6 rounded-xl shadow border border-gray-200">
+                                <h4 className="text-gray-500 font-bold text-sm mb-4 border-b pb-2">黑板演算過程</h4>
+                                
+                                <div className="space-y-6">
+                                    {/* 常數項檢驗 */}
+                                    <div>
+                                        <div className="flex justify-between items-center mb-1">
+                                            <span className="text-red-600 font-bold flex items-center">
+                                                <span className="mr-2">↓</span> 直的相乘 (常數項)
+                                            </span>
+                                            <span className="text-gray-400 text-sm">目標: {q.c}</span>
+                                        </div>
+                                        <div className="bg-gray-50 p-3 rounded font-mono flex items-center justify-between text-lg">
+                                            <span>({p}) × ({qVal}) = </span>
+                                            <span className={`font-bold px-3 py-1 rounded ${currentC === q.c ? 'bg-green-100 text-green-700' : 'bg-red-50 text-red-600'}`}>
+                                                {currentC}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    {/* 一次項檢驗 */}
+                                    <div>
+                                        <div className="flex justify-between items-center mb-1">
+                                            <span className="text-blue-600 font-bold flex items-center">
+                                                <span className="mr-2">╳</span> 交叉相乘再相加 (一次項)
+                                            </span>
+                                            <span className="text-gray-400 text-sm">目標: {q.b}x</span>
+                                        </div>
+                                        <div className="bg-gray-50 p-3 rounded font-mono flex items-center justify-between text-lg">
+                                            <span>{p}x + {qVal}x = </span>
+                                            <span className={`font-bold px-3 py-1 rounded ${currentB === q.b ? 'bg-green-100 text-green-700' : 'bg-red-50 text-red-600'}`}>
+                                                {currentB}x
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className={`p-4 rounded-xl shadow text-center block-transition border-2 ${isSolved ? 'bg-green-100 border-green-400' : 'bg-gray-100 border-gray-300'}`}>
+                                {isSolved ? (
+                                    <div className="pop-in">
+                                        <h4 className="text-green-800 font-bold text-xl mb-2">✅ 十字交乘成功！</h4>
+                                        <p className="text-green-700 font-mono text-lg bg-white inline-block px-4 py-2 rounded shadow-sm">
+                                            (x {p > 0 ? `+ ${p}` : `- ${Math.abs(p)}`})(x {qVal > 0 ? `+ ${qVal}` : `- ${Math.abs(qVal)}`})
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <div className="text-gray-500 font-bold">
+                                        {currentC === q.c ? "常數項對了！但交叉相乘後的一次項不對喔，再試試！" : "常數項還沒湊出來喔！"}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const Chapter3App = ({ onBack }) => {
+            const [activeTab, setActiveTab] = useState(1);
+
+            return (
+                <div className="max-w-4xl mx-auto p-4 md:p-8">
+                    <div className="flex items-center justify-between mb-6">
+                        <button onClick={onBack} className="text-blue-600 hover:text-blue-800 flex items-center font-semibold transition-colors">
+                            <span>← 返回目錄</span>
+                        </button>
+                        <h2 className="text-2xl font-bold text-gray-800">CH3 因式分解</h2>
+                        <div className="w-20"></div>
+                    </div>
+
+                    <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
+                        <div className="flex border-b border-gray-200 bg-gray-50 overflow-x-auto">
+                            {[
+                                { id: 1, name: '關卡一：面積拼圖' }, 
+                                { id: 2, name: '關卡二：密碼鎖' }
+                            ].map(tab => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveTab(tab.id)}
+                                    className={`flex-1 py-4 px-2 text-center font-bold text-sm md:text-lg transition-colors whitespace-nowrap ${
+                                        activeTab === tab.id 
+                                        ? 'bg-white text-blue-600 border-b-4 border-blue-600' 
+                                        : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700'
+                                    }`}
+                                >
+                                    {tab.name}
+                                </button>
+                            ))}
+                        </div>
+
+                        <div className="p-6 bg-white min-h-[400px]">
+                            {activeTab === 1 && <Chapter3Level1 />}
+                            {activeTab === 2 && <Chapter3Level2 />}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const App = () => {
+            const [currentView, setCurrentView] = useState('menu'); 
+
+            return (
+                <div className="font-sans">
+                    {currentView === 'menu' ? (
+                        <MainMenu onSelectChapter={(id) => setCurrentView(id)} />
+                    ) : currentView === 'ch1' ? (
+                        <Chapter1App onBack={() => setCurrentView('menu')} />
+                    ) : currentView === 'ch2' ? (
+                        <Chapter2App onBack={() => setCurrentView('menu')} />
+                    ) : currentView === 'ch3' ? (
+                        <Chapter3App onBack={() => setCurrentView('menu')} />
+                    ) : null}
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
