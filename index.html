@@ -63,7 +63,7 @@
                         { id: "ch1", name: t.chapters.ch1, available: true },
                         { id: "ch2", name: t.chapters.ch2, available: true },
                         { id: "ch3", name: t.chapters.ch3, available: true },
-                        { id: "ch4", name: t.chapters.ch4, available: false }
+                        { id: "ch4", name: t.chapters.ch4, available: true }
                     ]
                 },
                 {
@@ -1014,7 +1014,381 @@
             );
         };
 
-        const App = () => {
+        
+        // ==================== CH4 一元二次方程式 ====================
+        const Chapter4Level1 = ({ t }) => {
+            const [x, setX] = useState(0);
+            
+            const factor1 = x - 3;
+            const factor2 = x + 2;
+            const product = factor1 * factor2;
+            const isUnlocked = (factor1 === 0 || factor2 === 0);
+
+            return (
+                <div className="flex flex-col items-center p-4">
+                    <h3 className="text-xl font-bold mb-2 text-gray-700">{t.ch4.level1Title}</h3>
+                    <p className="mb-6 text-gray-600 text-center max-w-xl text-sm md:text-base">
+                        {t.ch4.level1Desc}
+                    </p>
+
+                    <div className="flex flex-col md:flex-row gap-8 items-center w-full max-w-4xl">
+                        {/* 金庫保險箱視覺化 */}
+                        <div className="flex-1 bg-gradient-to-b from-slate-800 to-slate-900 border-4 border-slate-700 rounded-2xl p-6 shadow-2xl flex flex-col items-center justify-center min-h-[340px] relative w-full overflow-hidden">
+                            {/* 金庫指示燈 */}
+                            <div className="absolute top-4 right-4 flex items-center space-x-2">
+                                <span className={`inline-block w-4 h-4 rounded-full ${isUnlocked ? 'bg-green-400 shadow-[0_0_12px_#4ade80]' : 'bg-red-500 animate-pulse'}`}></span>
+                                <span className="text-xs font-mono font-bold text-gray-300">
+                                    {isUnlocked ? t.ch4.vaultUnlocked : t.ch4.vaultLocked}
+                                </span>
+                            </div>
+
+                            {/* 齒輪鎖扣視覺 */}
+                            <div className="flex items-center justify-center space-x-6 my-6">
+                                {/* 左鎖扣 */}
+                                <div className={`flex flex-col items-center p-4 rounded-xl border-2 transition-all duration-300 ${factor1 === 0 ? 'bg-green-950/80 border-green-400 scale-110 shadow-lg' : 'bg-slate-800 border-slate-600'}`}>
+                                    <span className="text-gray-400 text-xs font-mono mb-1">{t.ch4.leftLock}</span>
+                                    <span className={`text-2xl md:text-3xl font-mono font-bold ${factor1 === 0 ? 'text-green-400' : 'text-blue-400'}`}>
+                                        {factor1 > 0 ? `+${factor1}` : factor1}
+                                    </span>
+                                    <span className="text-xs text-gray-500 mt-1">(x - 3)</span>
+                                </div>
+
+                                <span className="text-2xl text-gray-400 font-bold">×</span>
+
+                                {/* 右鎖扣 */}
+                                <div className={`flex flex-col items-center p-4 rounded-xl border-2 transition-all duration-300 ${factor2 === 0 ? 'bg-green-950/80 border-green-400 scale-110 shadow-lg' : 'bg-slate-800 border-slate-600'}`}>
+                                    <span className="text-gray-400 text-xs font-mono mb-1">{t.ch4.rightLock}</span>
+                                    <span className={`text-2xl md:text-3xl font-mono font-bold ${factor2 === 0 ? 'text-green-400' : 'text-purple-400'}`}>
+                                        {factor2 > 0 ? `+${factor2}` : factor2}
+                                    </span>
+                                    <span className="text-xs text-gray-500 mt-1">(x + 2)</span>
+                                </div>
+                            </div>
+
+                            {/* 總乘積 */}
+                            <div className="bg-slate-950/70 px-6 py-3 rounded-full border border-slate-700 flex items-center space-x-3">
+                                <span className="text-gray-400 text-sm">{t.ch4.totalProduct}</span>
+                                <span className={`text-2xl font-mono font-bold ${isUnlocked ? 'text-green-400' : 'text-yellow-400'}`}>
+                                    {product}
+                                </span>
+                            </div>
+
+                            {/* 解鎖動態 */}
+                            {isUnlocked && (
+                                <div className="absolute inset-0 bg-green-900/30 backdrop-blur-[2px] flex items-center justify-center pop-in pointer-events-none">
+                                    <div className="bg-white/95 text-green-800 font-bold px-6 py-3 rounded-2xl shadow-2xl text-lg flex items-center space-x-2 border border-green-300">
+                                        <span className="text-2xl">🎉</span>
+                                        <span>{t.ch4.vaultUnlocked}</span>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* 控制與學習面板 */}
+                        <div className="flex-1 w-full bg-white p-6 rounded-xl shadow border border-gray-200">
+                            <div className="mb-6">
+                                <label className="block text-gray-700 font-bold mb-2 text-base">
+                                    {t.ch4.sliderX} <span className="font-mono text-xl text-blue-600">{x}</span>
+                                </label>
+                                <input
+                                    type="range" min="-5" max="5" step="1"
+                                    value={x}
+                                    onChange={(e) => setX(parseInt(e.target.value))}
+                                    className="w-full cursor-pointer accent-blue-600 h-2 bg-gray-200 rounded-lg"
+                                />
+                                <div className="flex justify-between text-xs font-mono text-gray-400 mt-2 px-1">
+                                    <span>-5</span>
+                                    <span className="font-bold text-green-600">-2 (解)</span>
+                                    <span>0</span>
+                                    <span className="font-bold text-green-600">+3 (解)</span>
+                                    <span>+5</span>
+                                </div>
+                            </div>
+
+                            <div className="p-4 rounded-xl border-l-4 leading-relaxed bg-blue-50 border-blue-500 text-sm text-blue-900 space-y-2">
+                                <p className="font-bold text-base flex items-center">
+                                    <span className="mr-1">💡</span> {t.ch4.ahaTitle}
+                                </p>
+                                <p>{t.ch4.aha1}</p>
+                                <p>{t.ch4.aha2}</p>
+                                <p className="font-semibold text-blue-950 pt-2 border-t border-blue-200">
+                                    {t.ch4.ahaSummary}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const Chapter4Level2 = ({ t }) => {
+            const [step, setStep] = useState(0);
+
+            return (
+                <div className="flex flex-col items-center p-4">
+                    <h3 className="text-xl font-bold mb-2 text-gray-700">{t.ch4.level2Title}</h3>
+                    <p className="mb-6 text-gray-600 text-center max-w-xl text-sm md:text-base">
+                        {t.ch4.level2Desc}
+                    </p>
+
+                    <div className="flex flex-col md:flex-row gap-8 items-center w-full max-w-4xl">
+                        {/* 左側：幾何拼圖區 */}
+                        <div className="flex-1 bg-gray-50 border-2 border-dashed border-gray-300 p-8 rounded-2xl flex flex-col items-center justify-center min-h-[360px] w-full">
+                            <div className="relative w-[240px] h-[240px]">
+                                {/* 核心 x^2 正方形 */}
+                                <div className="absolute top-0 left-0 w-[140px] h-[140px] bg-blue-500 text-white font-bold text-2xl flex items-center justify-center rounded-sm shadow-md z-10">
+                                    x²
+                                </div>
+
+                                {/* 未切分時的 6x (右側長條) */}
+                                {step === 0 && (
+                                    <div className="absolute top-0 left-[140px] w-[80px] h-[140px] bg-green-400 text-white font-bold text-lg flex items-center justify-center border-l-2 border-white rounded-r-sm pop-in z-10">
+                                        6x
+                                    </div>
+                                )}
+
+                                {/* 切分後的 3x (右邊) */}
+                                {step >= 1 && (
+                                    <div className="absolute top-0 left-[140px] w-[60px] h-[140px] bg-green-500 text-white font-bold text-base flex items-center justify-center border-l-2 border-white rounded-tr-sm pop-in z-10">
+                                        3x
+                                    </div>
+                                )}
+
+                                {/* 切分後的 3x (下面) */}
+                                {step >= 1 && (
+                                    <div className="absolute top-[140px] left-0 w-[140px] h-[60px] bg-green-500 text-white font-bold text-base flex items-center justify-center border-t-2 border-white rounded-bl-sm pop-in z-10">
+                                        3x
+                                    </div>
+                                )}
+
+                                {/* 右下角缺口 / 補磚 */}
+                                {step === 1 && (
+                                    <div className="absolute top-[140px] left-[140px] w-[60px] h-[60px] border-2 border-dashed border-amber-500 bg-amber-50 flex items-center justify-center text-amber-700 font-bold text-xs pop-in text-center p-1">
+                                        缺 3×3
+                                    </div>
+                                )}
+
+                                {step >= 2 && (
+                                    <div className="absolute top-[140px] left-[140px] w-[60px] h-[60px] bg-amber-400 border border-white flex items-center justify-center text-amber-900 font-bold text-lg rounded-br-sm shadow-md pop-in z-10">
+                                        +9
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* 方程式狀態同步顯示 */}
+                            <div className="mt-6 font-mono text-center bg-white px-6 py-2 rounded-xl shadow-sm border border-gray-200">
+                                {step === 0 && <span className="text-lg font-bold text-gray-800">x² + 6x = 16</span>}
+                                {step === 1 && <span className="text-lg font-bold text-blue-700">x² + 3x + 3x = 16</span>}
+                                {step >= 2 && (
+                                    <span className="text-lg font-bold text-green-700">
+                                        (x + 3)² = 16 + 9 = 25
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* 右側：解題控制面板 */}
+                        <div className="flex-1 w-full bg-white p-6 rounded-xl shadow border border-gray-200 space-y-4">
+                            <div className="p-4 rounded-xl bg-gray-50 border border-gray-200 text-sm leading-relaxed text-gray-700">
+                                {step === 0 && t.ch4.step0Info}
+                                {step === 1 && t.ch4.step1Info}
+                                {step === 2 && t.ch4.step2Info}
+                                {step === 3 && t.ch4.step3Success}
+                            </div>
+
+                            <div className="space-y-3 pt-2">
+                                {step === 0 && (
+                                    <button
+                                        onClick={() => setStep(1)}
+                                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl shadow transition active:scale-95"
+                                    >
+                                        {t.ch4.step0Btn}
+                                    </button>
+                                )}
+
+                                {step === 1 && (
+                                    <button
+                                        onClick={() => setStep(2)}
+                                        className="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-4 rounded-xl shadow transition active:scale-95 animate-pulse"
+                                    >
+                                        {t.ch4.step1Btn}
+                                    </button>
+                                )}
+
+                                {step === 2 && (
+                                    <button
+                                        onClick={() => setStep(3)}
+                                        className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-xl shadow transition active:scale-95"
+                                    >
+                                        {t.ch4.step2Btn}
+                                    </button>
+                                )}
+
+                                {step === 3 && (
+                                    <button
+                                        onClick={() => setStep(0)}
+                                        className="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-4 rounded-xl transition"
+                                    >
+                                        {t.ch4.resetBtn}
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const Chapter4Level3 = ({ t }) => {
+            const [c, setC] = useState(4); // 預設 c = 4 (Δ = 0)
+            
+            // y = x^2 - 4x + c
+            // 頂點 (2, c - 4)
+            const discriminant = 16 - 4 * c;
+
+            // SVG 座標對齊：寬 400，高 260
+            // x 範圍：-1 到 5 (原點 cx = 100, scaleX = 40)
+            // y 水面：cy = 160 (y = 0 水面)
+            // scaleY = 20
+            const cx = 160;
+            const cy = 160;
+            const scaleX = 40;
+            const scaleY = 20;
+
+            // 產生拋物線路徑
+            const points = [];
+            for (let px = -1; px <= 5.1; px += 0.1) {
+                const py = px * px - 4 * px + c;
+                const screenX = cx + (px - 2) * scaleX;
+                const screenY = cy - py * scaleY;
+                points.push(`${screenX},${screenY}`);
+            }
+            const pathData = "M " + points.join(" L ");
+
+            return (
+                <div className="flex flex-col items-center p-4">
+                    <h3 className="text-xl font-bold mb-2 text-gray-700">{t.ch4.level3Title}</h3>
+                    <p className="mb-4 text-gray-600 text-center max-w-xl text-sm md:text-base">
+                        {t.ch4.level3Desc}
+                    </p>
+
+                    <div className="flex flex-col md:flex-row gap-8 items-center w-full max-w-4xl">
+                        {/* 拋物線水面互動畫布 */}
+                        <div className="flex-1 bg-slate-900 border-2 border-slate-700 rounded-2xl p-4 shadow-xl flex flex-col items-center relative overflow-hidden w-full">
+                            <svg viewBox="0 0 320 240" className="w-full h-auto">
+                                {/* 水面背景 (y <= 0) */}
+                                <rect x="0" y={cy} width="320" height={240 - cy} fill="#0284c7" opacity="0.25" />
+                                
+                                {/* 水面基準線 y = 0 */}
+                                <line x1="0" y1={cy} x2="320" y2={cy} stroke="#38bdf8" strokeWidth="2" strokeDasharray="4 4" />
+                                <text x="10" y={cy - 6} fill="#38bdf8" className="text-xs font-mono font-bold">y = 0 (水面)</text>
+
+                                {/* 拋物線 */}
+                                <path d={pathData} fill="none" stroke="#f59e0b" strokeWidth="3" className="block-transition" />
+
+                                {/* 頂點標示 */}
+                                <circle cx={cx} cy={cy - (c - 4) * scaleY} r="5" fill="#ef4444" className="block-transition" />
+
+                                {/* 交點標示水花 */}
+                                {discriminant > 0 && (
+                                    <>
+                                        <circle cx={cx - Math.sqrt(discriminant)/2 * scaleX} cy={cy} r="6" fill="#22c55e" className="pop-in" />
+                                        <circle cx={cx + Math.sqrt(discriminant)/2 * scaleX} cy={cy} r="6" fill="#22c55e" className="pop-in" />
+                                    </>
+                                )}
+
+                                {discriminant === 0 && (
+                                    <circle cx={cx} cy={cy} r="6" fill="#22c55e" className="pop-in" />
+                                )}
+                            </svg>
+
+                            {/* 即時狀態徽章 */}
+                            <div className="mt-3 text-center">
+                                <span className={`px-4 py-1.5 rounded-full font-bold text-sm ${discriminant > 0 ? 'bg-green-900/60 text-green-300 border border-green-500' : discriminant === 0 ? 'bg-yellow-900/60 text-yellow-300 border border-yellow-500' : 'bg-blue-900/60 text-blue-300 border border-blue-500'}`}>
+                                    {discriminant > 0 ? t.ch4.status2Roots : discriminant === 0 ? t.ch4.status1Root : t.ch4.status0Roots}
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* 控制面板 */}
+                        <div className="flex-1 w-full bg-white p-6 rounded-xl shadow border border-gray-200 space-y-4">
+                            <div>
+                                <label className="block text-gray-700 font-bold mb-2">
+                                    {t.ch4.adjustC} <span className="font-mono text-xl text-amber-600">{c}</span>
+                                </label>
+                                <input
+                                    type="range" min="1" max="7" step="1"
+                                    value={c}
+                                    onChange={(e) => setC(parseInt(e.target.value))}
+                                    className="w-full cursor-pointer accent-amber-500 h-2 bg-gray-200 rounded-lg"
+                                />
+                                <div className="flex justify-between text-xs font-mono text-gray-400 mt-2 px-1">
+                                    <span>c=1 (Δ=12)</span>
+                                    <span className="font-bold text-yellow-600">c=4 (Δ=0 重根)</span>
+                                    <span>c=7 (Δ=-12)</span>
+                                </div>
+                            </div>
+
+                            <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 font-mono text-sm space-y-2">
+                                <p className="text-gray-600">{t.ch4.equationDisplay.replace('{c}', c)}</p>
+                                <p className="font-bold text-gray-800">
+                                    {t.ch4.discriminantText.replace('{c}', c)}{' '}
+                                    <span className={`text-lg ${discriminant > 0 ? 'text-green-600' : discriminant === 0 ? 'text-yellow-600' : 'text-blue-600'}`}>
+                                        {discriminant}
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const Chapter4App = ({ onBack, lang, setLang, t }) => {
+            const [activeTab, setActiveTab] = useState(1);
+
+            return (
+                <div className="max-w-4xl mx-auto p-4 md:p-8">
+                    <div className="flex items-center justify-between mb-6">
+                        <button onClick={onBack} className="text-blue-600 hover:text-blue-800 flex items-center font-semibold transition-colors">
+                            <span>{t.backToMenu}</span>
+                        </button>
+                        <h2 className="text-xl md:text-2xl font-bold text-gray-800">{t.ch4 ? t.ch4.title : "CH4"}</h2>
+                        <LanguageSelector currentLang={lang} onSelectLang={setLang} />
+                    </div>
+
+                    <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
+                        <div className="flex border-b border-gray-200 bg-gray-50 overflow-x-auto">
+                            {[
+                                { id: 1, name: t.ch4.tab1 },
+                                { id: 2, name: t.ch4.tab2 },
+                                { id: 3, name: t.ch4.tab3 }
+                            ].map(tab => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveTab(tab.id)}
+                                    className={`flex-1 py-4 px-2 text-center font-bold text-sm md:text-lg transition-colors whitespace-nowrap ${
+                                        activeTab === tab.id
+                                            ? 'bg-white text-blue-600 border-b-4 border-blue-600'
+                                            : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700'
+                                    }`}
+                                >
+                                    {tab.name}
+                                </button>
+                            ))}
+                        </div>
+
+                        <div className="p-6 bg-white min-h-[400px]">
+                            {activeTab === 1 && <Chapter4Level1 t={t} />}
+                            {activeTab === 2 && <Chapter4Level2 t={t} />}
+                            {activeTab === 3 && <Chapter4Level3 t={t} />}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+const App = () => {
             const [currentView, setCurrentView] = useState('menu');
             const [lang, setLang] = useState('zh');
             const t = (window.TRANSLATIONS && window.TRANSLATIONS[lang]) || (window.TRANSLATIONS && window.TRANSLATIONS.zh) || {};
