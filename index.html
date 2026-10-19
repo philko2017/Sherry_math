@@ -8,6 +8,7 @@
     <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="translations.js"></script>
     
     <style>
         .block-transition {
@@ -27,34 +28,63 @@
 
     <script type="text/babel">
         const { useState, useEffect } = React;
+        const LanguageSelector = ({ currentLang, onSelectLang }) => {
+            const languages = [
+                { id: "zh", label: "繁中", flag: "🇹🇼" },
+                { id: "en", label: "EN", flag: "🇬🇧" },
+                { id: "fr", label: "FR", flag: "🇫🇷" },
+            ];
+            return (
+                <div className="inline-flex items-center bg-white/90 backdrop-blur-md rounded-full p-1 shadow border border-gray-200">
+                    {languages.map(l => (
+                        <button
+                            key={l.id}
+                            onClick={() => onSelectLang(l.id)}
+                            className={`px-3 py-1 rounded-full text-xs md:text-sm font-bold transition-all duration-200 flex items-center ${
+                                currentLang === l.id
+                                    ? "bg-blue-600 text-white shadow"
+                                    : "text-gray-600 hover:text-blue-600"
+                            }`}
+                        >
+                            <span className="mr-1">{l.flag}</span>
+                            <span>{l.label}</span>
+                        </button>
+                    ))}
+                </div>
+            );
+        };
 
-        const MainMenu = ({ onSelectChapter }) => {
+
+        const MainMenu = ({ onSelectChapter, lang, setLang, t }) => {
             const syllabus = [
                 {
-                    term: "八年級上學期",
+                    term: t.term1,
                     chapters: [
-                        { id: "ch1", name: "CH1 乘法公式與多項式", available: true },
-                        { id: "ch2", name: "CH2 平方根與畢氏定理", available: true },
-                        { id: "ch3", name: "CH3 因式分解", available: true },
-                        { id: "ch4", name: "CH4 一元二次方程式", available: false }
+                        { id: "ch1", name: t.chapters.ch1, available: true },
+                        { id: "ch2", name: t.chapters.ch2, available: true },
+                        { id: "ch3", name: t.chapters.ch3, available: true },
+                        { id: "ch4", name: t.chapters.ch4, available: false }
                     ]
                 },
                 {
-                    term: "八年級下學期",
+                    term: t.term2,
                     chapters: [
-                        { id: "ch5", name: "CH1 等差數列與級數", available: false },
-                        { id: "ch6", name: "CH2 幾何圖形與尺規作圖", available: false },
-                        { id: "ch7", name: "CH3 三角形的基本性質", available: false },
-                        { id: "ch8", name: "CH4 平行與四邊形", available: false }
+                        { id: "ch5", name: t.chapters.ch5, available: false },
+                        { id: "ch6", name: t.chapters.ch6, available: false },
+                        { id: "ch7", name: t.chapters.ch7, available: false },
+                        { id: "ch8", name: t.chapters.ch8, available: false }
                     ]
                 }
             ];
 
             return (
                 <div className="max-w-4xl mx-auto p-8">
+                    <div className="flex justify-end mb-4">
+                        <LanguageSelector currentLang={lang} onSelectLang={setLang} />
+                    </div>
                     <header className="text-center mb-10">
-                        <h1 className="text-4xl font-bold text-blue-800 mb-2">📐 Sherry's Math 互動沙盒</h1>
-                        <p className="text-gray-600">選擇一個單元開始探索數學的視覺奧秘</p>
+                        <h1 className="text-4xl font-bold text-blue-800 mb-2">{t.appName}</h1>
+                        <p className="text-gray-600">{t.appSubtitle}</p>
                     </header>
                     
                     <div className="space-y-8">
@@ -65,7 +95,7 @@
                                     {term.chapters.map(ch => (
                                         <button 
                                             key={ch.id}
-                                            onClick={() => ch.available ? onSelectChapter(ch.id) : alert("這個單元還在開發中喔！")}
+                                            onClick={() => ch.available ? onSelectChapter(ch.id) : alert(t.comingSoonAlert)}
                                             className={`p-4 rounded-lg text-left transition-all duration-300 ${
                                                 ch.available 
                                                 ? "bg-blue-50 hover:bg-blue-100 hover:shadow-md hover:-translate-y-1 border border-blue-200 cursor-pointer" 
@@ -76,7 +106,7 @@
                                                 {ch.name}
                                             </h3>
                                             <p className="text-sm mt-1">
-                                                {ch.available ? "👉 點擊進入互動教具" : "🚧 施工中..."}
+                                                {ch.available ? t.clickToEnter : t.underConstruction}
                                             </p>
                                         </button>
                                     ))}
@@ -88,7 +118,7 @@
             );
         };
 
-        const Level1 = () => {
+        const Level1 = ({ t }) => {
             const [a, setA] = useState(4);
             const [b, setB] = useState(2);
             
@@ -99,7 +129,7 @@
 
             return (
                 <div className="flex flex-col items-center p-4">
-                    <h3 className="text-xl font-bold mb-4 text-gray-700">關卡一：觀察 (a+b) 的正方形</h3>
+                    <h3 className="text-xl font-bold mb-4 text-gray-700">{t.ch1.level1Title}</h3>
                     
                     <div className="flex flex-col md:flex-row gap-8 items-center w-full max-w-4xl">
                         {/* 左側：視覺化圖形 */}
@@ -110,7 +140,7 @@
                                 {/* 頂部外圍邊長標示 */}
                                 <div className="absolute top-0 block-transition" style={{ left: `${offset}px`, width: `${totalWidth}px`, height: `${offset}px` }}>
                                     <div className="absolute top-2 w-full flex justify-center">
-                                        <div className="font-bold text-gray-800 whitespace-nowrap text-lg">邊長 (a + b) = {a + b}</div>
+                                        <div className="font-bold text-gray-800 whitespace-nowrap text-lg">{t.ch1.sideLength} {a + b}</div>
                                     </div>
                                     <div className="relative w-full h-full">
                                         {/* a 的標示線 */}
@@ -128,7 +158,7 @@
                                 <div className="absolute left-0 block-transition" style={{ top: `${offset}px`, height: `${totalWidth}px`, width: `${offset}px` }}>
                                     {/* 使用 Flex 容器與固定寬度來安全置中旋轉的文字 */}
                                     <div className="absolute left-2 top-0 w-[40px] h-full flex items-center justify-center">
-                                        <div className="-rotate-90 font-bold text-gray-800 whitespace-nowrap text-lg">邊長 (a + b) = {a + b}</div>
+                                        <div className="-rotate-90 font-bold text-gray-800 whitespace-nowrap text-lg">{t.ch1.sideLength} {a + b}</div>
                                     </div>
                                     <div className="relative w-full h-full">
                                         {/* a 的標示線 */}
@@ -166,16 +196,16 @@
                         {/* 右側：控制面板 */}
                         <div className="flex-1 bg-white p-6 rounded-lg shadow w-full">
                             <div className="mb-6">
-                                <label className="block text-gray-700 font-bold mb-2">調整 a 的長度: {a}</label>
+                                <label className="block text-gray-700 font-bold mb-2">{t.ch1.adjustA} {a}</label>
                                 <input type="range" min="1" max="5" value={a} onChange={(e) => setA(parseInt(e.target.value))} className="w-full cursor-pointer accent-red-500" />
                             </div>
                             <div className="mb-6">
-                                <label className="block text-gray-700 font-bold mb-2">調整 b 的長度: {b}</label>
+                                <label className="block text-gray-700 font-bold mb-2">{t.ch1.adjustB} {b}</label>
                                 <input type="range" min="1" max="5" value={b} onChange={(e) => setB(parseInt(e.target.value))} className="w-full cursor-pointer accent-blue-500" />
                             </div>
                             <div className="bg-blue-50 p-4 rounded text-sm text-blue-800 leading-relaxed">
-                                💡 觀察左圖，無論你怎麼拉動滑桿，一個邊長為 (a+b) 的大正方形，永遠會被切成四塊：<br/>
-                                <span className="font-bold text-red-600">一個 a²</span>、<span className="font-bold text-blue-600">一個 b²</span>、以及<span className="font-bold text-green-600">兩個 ab</span>！
+                                {t.ch1.tipAha}<br/>
+                                <span className="font-bold text-red-600">{t.ch1.oneA2}</span>、<span className="font-bold text-blue-600">{t.ch1.oneB2}</span>{t.ch1.and}<span className="font-bold text-green-600">{t.ch1.twoAB}</span>！
                             </div>
                         </div>
                     </div>
@@ -183,7 +213,7 @@
             );
         };
 
-        const Level2 = () => {
+        const Level2 = ({ t }) => {
             const [blocks, setBlocks] = useState({ a2: false, b2: false, ab1: false, ab2: false });
             const [step, setStep] = useState(0);
             
@@ -204,11 +234,11 @@
 
             return (
                 <div className="flex flex-col items-center p-4">
-                    <h3 className="text-xl font-bold mb-4 text-gray-700">關卡二：(3+2) 的正方形陷阱</h3>
+                    <h3 className="text-xl font-bold mb-4 text-gray-700">{t.ch1.level2Title}</h3>
                     <div className="flex flex-col md:flex-row gap-8 w-full max-w-4xl">
                         <div className="flex-1 flex justify-center bg-gray-50 border-2 border-gray-200 p-8 rounded-lg">
                             <div className="relative w-[250px] h-[250px] border-4 border-dashed border-gray-400 bg-white">
-                                <div className="absolute -top-8 w-full text-center font-bold text-gray-600">目標：邊長 5 (即 3+2)</div>
+                                <div className="absolute -top-8 w-full text-center font-bold text-gray-600">{t.ch1.targetSide}</div>
                                 <div className={`absolute top-0 left-0 w-[150px] h-[150px] bg-red-400 border border-white flex items-center justify-center text-white font-bold text-xl block-transition ${blocks.a2 ? 'opacity-100 scale-100' : 'opacity-0 scale-50'}`}>3²</div>
                                 <div className={`absolute bottom-0 right-0 w-[100px] h-[100px] bg-blue-400 border border-white flex items-center justify-center text-white font-bold text-xl block-transition ${blocks.b2 ? 'opacity-100 scale-100' : 'opacity-0 scale-50'}`}>2²</div>
                                 <div className={`absolute top-0 right-0 w-[100px] h-[150px] bg-green-400 border border-white flex items-center justify-center text-white font-bold text-xl block-transition ${blocks.ab1 ? 'opacity-100 scale-100' : 'opacity-0 scale-50'}`}>3×2</div>
@@ -218,13 +248,13 @@
 
                         <div className="flex-1 bg-white p-6 rounded-lg shadow">
                             <div className="mb-6">
-                                <p className="text-gray-700 font-bold mb-4">題目：請用積木拼出 (3+2)² 的面積</p>
+                                <p className="text-gray-700 font-bold mb-4">{t.ch1.questionPrompt}</p>
                                 
                                 {step === 0 && (
                                     <div className="space-y-4 pop-in">
-                                        <p className="text-sm text-gray-600">很多人以為 (3+2)² 就是 3² + 2²，我們來試試看這樣對不對？</p>
+                                        <p className="text-sm text-gray-600">{t.ch1.step0Desc}</p>
                                         <button onClick={handlePlaceFirstTwo} className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded shadow">
-                                            放入 3² 和 2² 積木
+                                            {t.ch1.step0Btn}
                                         </button>
                                     </div>
                                 )}
@@ -232,11 +262,11 @@
                                 {step === 1 && (
                                     <div className="space-y-4 pop-in">
                                         <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
-                                            <p className="text-yellow-800 font-bold">哎呀！發現了嗎？</p>
-                                            <p className="text-sm text-yellow-700 mt-1">正方形破了兩個大洞！原來 (3+2)² 絕對不只等於 3² + 2²！</p>
+                                            <p className="text-yellow-800 font-bold">{t.ch1.step1NoticeTitle}</p>
+                                            <p className="text-sm text-yellow-700 mt-1">{t.ch1.step1NoticeDesc}</p>
                                         </div>
                                         <button onClick={handlePlaceLastTwo} className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded shadow animate-pulse">
-                                            呼叫救援：補上缺少的兩塊積木
+                                            {t.ch1.step1Btn}
                                         </button>
                                     </div>
                                 )}
@@ -244,13 +274,13 @@
                                 {step === 2 && (
                                     <div className="space-y-4 pop-in">
                                         <div className="bg-green-50 border-l-4 border-green-400 p-4">
-                                            <p className="text-green-800 font-bold text-lg">✨ 完美拼滿！</p>
-                                            <p className="text-sm text-green-700 mt-2">所以正確的公式是：<br/>
+                                            <p className="text-green-800 font-bold text-lg">{t.ch1.step2SuccessTitle}</p>
+                                            <p className="text-sm text-green-700 mt-2">{t.ch1.step2Formula}<br/>
                                                 <span className="font-mono text-base">(3+2)² = 3² + 2×(3×2) + 2²</span>
                                             </p>
                                         </div>
                                         <button onClick={reset} className="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded">
-                                            再來一次
+                                            {t.ch1.step2Btn}
                                         </button>
                                     </div>
                                 )}
@@ -261,24 +291,24 @@
             );
         };
 
-        const Chapter1App = ({ onBack }) => {
+        const Chapter1App = ({ onBack, lang, setLang, t }) => {
             const [activeTab, setActiveTab] = useState(1);
 
             return (
                 <div className="max-w-4xl mx-auto p-4 md:p-8">
                     <div className="flex items-center justify-between mb-6">
                         <button onClick={onBack} className="text-blue-600 hover:text-blue-800 flex items-center font-semibold transition-colors">
-                            <span>← 返回目錄</span>
+                            <span>{t.backToMenu}</span>
                         </button>
-                        <h2 className="text-2xl font-bold text-gray-800">CH1 乘法公式與多項式</h2>
-                        <div className="w-20"></div>
+                        <h2 className="text-xl md:text-2xl font-bold text-gray-800">{t.ch1 ? t.ch1.title : "CH1"}</h2>
+                        <LanguageSelector currentLang={lang} onSelectLang={setLang} />
                     </div>
 
                     <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
                         <div className="flex border-b border-gray-200 bg-gray-50 overflow-x-auto">
                             {[
-                                { id: 1, name: '關卡一：觀察積木' }, 
-                                { id: 2, name: '關卡二：面積陷阱' }
+                                { id: 1, name: t.ch1.tab1 }, 
+                                { id: 2, name: t.ch1.tab2 }
                             ].map(tab => (
                                 <button
                                     key={tab.id}
@@ -295,15 +325,15 @@
                         </div>
 
                         <div className="p-6 bg-white min-h-[400px]">
-                            {activeTab === 1 && <Level1 />}
-                            {activeTab === 2 && <Level2 />}
+                            {activeTab === 1 && <Level1 t={t} />}
+                            {activeTab === 2 && <Level2 t={t} />}
                         </div>
                     </div>
                 </div>
             );
         };
 
-        const Chapter2Level1 = () => {
+        const Chapter2Level1 = ({ t }) => {
             const [isTransferred, setIsTransferred] = useState(false);
             const [triple, setTriple] = useState({ a: 3, b: 4, c: 5 });
 
@@ -348,7 +378,7 @@
 
             return (
                 <div className="flex flex-col items-center p-4">
-                    <h3 className="text-xl font-bold mb-4 text-gray-700">關卡一：面積方塊大轉移</h3>
+                    <h3 className="text-xl font-bold mb-4 text-gray-700">{t.ch2.level1Title}</h3>
                     
                     <div className="flex flex-col md:flex-row gap-8 items-center w-full max-w-4xl">
                         {/* 左側：SVG 視覺化 */}
@@ -376,8 +406,8 @@
                                 <rect x={cx} y={cy-10} width="10" height="10" fill="none" stroke="#374151" strokeWidth="2"/>
                                 
                                 {/* 標示文字 */}
-                                <text x={cx - a*scale/2} y={cy - a*scale - 15} textAnchor="middle" fill="#ef4444" className="font-bold">a² ({a*a}塊)</text>
-                                <text x={cx + b*scale/2} y={cy + b*scale + 25} textAnchor="middle" fill="#3b82f6" className="font-bold">b² ({b*b}塊)</text>
+                                <text x={cx - a*scale/2} y={cy - a*scale - 15} textAnchor="middle" fill="#ef4444" className="font-bold">a² ({a*a}{t.ch2.blocksUnit})</text>
+                                <text x={cx + b*scale/2} y={cy + b*scale + 25} textAnchor="middle" fill="#3b82f6" className="font-bold">b² ({b*b}{t.ch2.blocksUnit})</text>
                                 
                                 {/* C 正方形文字標示 */}
                                 <text 
@@ -387,7 +417,7 @@
                                         opacity: isTransferred ? 1 : 0.4
                                     }}
                                 >
-                                    c² ({c*c}塊)
+                                    c² ({c*c}{t.ch2.blocksUnit})
                                 </text>
 
                                 {/* 動態紅方塊 */}
@@ -421,7 +451,7 @@
                         {/* 右側：控制面板 */}
                         <div className="flex-1 bg-white p-6 rounded-lg shadow w-full">
                             <div className="mb-6">
-                                <label className="block text-gray-700 font-bold mb-3">切換其他直角三角形測試：</label>
+                                <label className="block text-gray-700 font-bold mb-3">{t.ch2.testOtherTriangles}</label>
                                 <div className="flex flex-wrap gap-2">
                                     {[
                                         { a: 3, b: 4, c: 5 },
@@ -448,12 +478,12 @@
                                 onClick={() => setIsTransferred(!isTransferred)} 
                                 className={`w-full py-4 px-4 rounded-xl font-bold text-lg text-white shadow-lg transition-transform active:scale-95 ${isTransferred ? 'bg-gray-500 hover:bg-gray-600' : 'bg-purple-600 hover:bg-purple-700'}`}
                             >
-                                {isTransferred ? "🔄 歸位方塊" : "✨ 開始搬運方塊入庫"}
+                                {isTransferred ? t.ch2.btnReset : t.ch2.btnTransfer}
                             </button>
 
                             <div className={`mt-6 p-5 rounded-lg text-base leading-relaxed border block-transition ${isTransferred ? 'bg-purple-50 border-purple-200 text-purple-900' : 'bg-gray-50 border-gray-200 text-gray-400'}`}>
                                 💡 <strong>Aha Moment！</strong><br/>
-                                <span className={isTransferred ? 'text-red-600 font-bold' : ''}>{a*a} 塊</span>加上 <span className={isTransferred ? 'text-blue-600 font-bold' : ''}>{b*b} 塊</span>，飛過去之後竟然「剛剛好」填滿了斜邊的 <span className={isTransferred ? 'text-purple-600 font-bold' : ''}>{c*c} 個空位</span>！<br/><br/>
+                                <span className={isTransferred ? 'text-red-600 font-bold' : ''}>{a*a} {t.ch2.blocksUnit}</span>{t.ch2.ahaDescPart1} <span className={isTransferred ? 'text-blue-600 font-bold' : ''}>{b*b} {t.ch2.blocksUnit}</span>{t.ch2.ahaDescPart2} <span className={isTransferred ? 'text-purple-600 font-bold' : ''}>{c*c} {t.ch2.slotsUnit}</span>{t.ch2.ahaDescPart3}<br/><br/>
                                 這就是 <strong>a² + b² = c²</strong> 最直觀的面積證據！
                             </div>
                         </div>
@@ -462,14 +492,14 @@
             );
         };
 
-        const Chapter2Level2 = () => {
+        const Chapter2Level2 = ({ t }) => {
             const [step, setStep] = useState(0); 
             const [feedback, setFeedback] = useState("");
             
             const questions = [
-                { angle: 0, desc: "這是一般的直角三角形" },
-                { angle: -60, desc: "如果它翹起來了呢？" },
-                { angle: 135, desc: "如果它倒頭栽了呢？" }
+                { angle: 0, desc: t.ch2.q1 },
+                { angle: -60, desc: t.ch2.q2 },
+                { angle: 135, desc: t.ch2.q3 }
             ];
             
             const currentQ = questions[step];
@@ -482,23 +512,23 @@
 
             const handleSquareClick = (type) => {
                 if (type === 'C') {
-                    setFeedback("✅ 答對了！斜邊永遠都在直角的正對面喔！");
+                    setFeedback(t.ch2.correctMsg);
                     setTimeout(() => {
                         if(step < 2) {
                             setStep(step + 1);
                             setFeedback("");
                         } else {
-                            setFeedback("🎉 恭喜通關！你已經不會被旋轉騙倒了！");
+                            setFeedback(t.ch2.finishMsg);
                         }
                     }, 2500);
                 } else {
-                    setFeedback("❌ 不對喔！找找看直角「正對面」的那一條邊！");
+                    setFeedback(t.ch2.wrongMsg);
                 }
             };
 
             return (
                 <div className="flex flex-col items-center p-4">
-                    <h3 className="text-xl font-bold mb-2 text-gray-700">關卡二：旋轉橡皮筋</h3>
+                    <h3 className="text-xl font-bold mb-2 text-gray-700">{t.ch2.level2Title}</h3>
                     <p className="mb-4 text-gray-600 text-center">直角三角形常常會轉來轉去騙人。<br/>請點擊下方圖形中 <strong>「斜邊 (最長邊) 對應的面積」</strong>！</p>
                     
                     <div className="w-full max-w-xl bg-gray-50 border-2 border-gray-200 rounded-xl p-4 flex flex-col items-center relative overflow-hidden h-[450px]">
@@ -530,7 +560,7 @@
             );
         };
 
-        const Chapter2Level3 = () => {
+        const Chapter2Level3 = ({ t }) => {
             const [side, setSide] = useState(1.0);
             const [showHint, setShowHint] = useState(false);
             const [isSolved, setIsSolved] = useState(false);
@@ -549,14 +579,14 @@
 
             return (
                 <div className="flex flex-col items-center p-4">
-                    <h3 className="text-xl font-bold mb-2 text-gray-700">關卡三：解開根號封印</h3>
+                    <h3 className="text-xl font-bold mb-2 text-gray-700">{t.ch2.level3Title}</h3>
                     <p className="mb-6 text-gray-600">如果現在有一個水箱，面積剛好是 <strong>10</strong>，那它的邊長應該拉到多少？</p>
                     
                     <div className="flex flex-col md:flex-row gap-8 items-center w-full max-w-3xl">
                         <div className="flex-1 bg-gray-50 border-2 border-gray-200 rounded-xl p-8 flex justify-center items-center h-[300px] relative">
                             <div className="absolute border-4 border-dashed border-gray-400 rounded-sm flex items-center justify-center"
                                  style={{ width: `${targetSidePx}px`, height: `${targetSidePx}px` }}>
-                                <span className="text-gray-400 font-bold text-2xl opacity-50 z-0">目標 10</span>
+                                <span className="text-gray-400 font-bold text-2xl opacity-50 z-0">{t.ch2.target10}</span>
                             </div>
 
                             <div className="absolute bg-blue-500 border-2 border-white shadow-lg flex items-center justify-center opacity-80 block-transition z-10"
@@ -570,7 +600,7 @@
                         <div className="flex-1 w-full flex flex-col justify-center">
                             <div className="bg-white p-6 rounded-lg shadow-md mb-4">
                                 <label className="block text-gray-700 font-bold mb-2 text-lg">
-                                    測試邊長: <span className="text-blue-600">{isSolved ? '√10 (約 3.162)' : side.toFixed(1)}</span>
+                                    {t.ch2.testSide} <span className="text-blue-600">{isSolved ? t.ch2.approxRoot10 : side.toFixed(1)}</span>
                                 </label>
                                 <input 
                                     type="range" min="1" max="5" step="0.1" 
@@ -588,20 +618,20 @@
                                     disabled={isSolved}
                                 />
                                 <div className="text-center bg-gray-100 p-3 rounded font-mono text-lg">
-                                    面積 = {isSolved ? '√10' : side.toFixed(1)} × {isSolved ? '√10' : side.toFixed(1)} <br/>
+                                    {t.ch2.areaFormulaText} {isSolved ? '√10' : side.toFixed(1)} × {isSolved ? '√10' : side.toFixed(1)} <br/>
                                     <span className="font-bold text-red-600">= {isSolved ? '10' : currentArea}</span>
                                 </div>
                             </div>
 
                             {showHint && !isSolved && (
                                 <div className="pop-in bg-yellow-100 border border-yellow-300 p-4 rounded-lg text-yellow-800 text-sm mb-4 font-bold">
-                                    發現了嗎？3.1 的平方是 9.61，3.2 的平方是 10.24。你永遠找不到一個「剛剛好」的整數或小數！
+                                    {t.ch2.hintRoot10}
                                 </div>
                             )}
 
                             {(!isSolved) && (
                                 <button onClick={handleSolve} className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-4 rounded-lg shadow-md transition-transform active:scale-95 pop-in">
-                                    🪄 點我召喚「根號法寶」
+                                    {t.ch2.btnSummonRoot}
                                 </button>
                             )}
 
@@ -618,25 +648,25 @@
             );
         };
 
-        const Chapter2App = ({ onBack }) => {
+        const Chapter2App = ({ onBack, lang, setLang, t }) => {
             const [activeTab, setActiveTab] = useState(1);
 
             return (
                 <div className="max-w-4xl mx-auto p-4 md:p-8">
                     <div className="flex items-center justify-between mb-6">
                         <button onClick={onBack} className="text-blue-600 hover:text-blue-800 flex items-center font-semibold transition-colors">
-                            <span>← 返回目錄</span>
+                            <span>{t.backToMenu}</span>
                         </button>
-                        <h2 className="text-2xl font-bold text-gray-800">CH2 畢氏定理：水箱與面積</h2>
-                        <div className="w-20"></div>
+                        <h2 className="text-xl md:text-2xl font-bold text-gray-800">{t.ch2 ? t.ch2.title : "CH2"}</h2>
+                        <LanguageSelector currentLang={lang} onSelectLang={setLang} />
                     </div>
 
                     <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
                         <div className="flex border-b border-gray-200 bg-gray-50 overflow-x-auto">
                             {[
-                                { id: 1, name: '關卡一：面積大轉移' }, 
-                                { id: 2, name: '關卡二：旋轉橡皮筋' }, 
-                                { id: 3, name: '關卡三：解開根號封印' }
+                                { id: 1, name: t.ch2.tab1 }, 
+                                { id: 2, name: t.ch2.tab2 }, 
+                                { id: 3, name: t.ch2.tab3 }
                             ].map(tab => (
                                 <button
                                     key={tab.id}
@@ -653,16 +683,16 @@
                         </div>
 
                         <div className="p-6 bg-white min-h-[400px]">
-                            {activeTab === 1 && <Chapter2Level1 />}
-                            {activeTab === 2 && <Chapter2Level2 />}
-                            {activeTab === 3 && <Chapter2Level3 />}
+                            {activeTab === 1 && <Chapter2Level1 t={t} />}
+                            {activeTab === 2 && <Chapter2Level2 t={t} />}
+                            {activeTab === 3 && <Chapter2Level3 t={t} />}
                         </div>
                     </div>
                 </div>
             );
         };
 
-        const Chapter3Level1 = () => {
+        const Chapter3Level1 = ({ t }) => {
             const questions = [
                 { b: 7, c: 10, text: "x² + 7x + 10" },
                 { b: 5, c: 6, text: "x² + 5x + 6" },
@@ -687,7 +717,7 @@
 
             return (
                 <div className="flex flex-col items-center p-2 md:p-4">
-                    <h3 className="text-xl font-bold mb-2 text-gray-700">關卡一：十字交乘的幾何真面目</h3>
+                    <h3 className="text-xl font-bold mb-2 text-gray-700">{t.ch3.level1Title}</h3>
                     
                     {/* 題庫切換器 */}
                     <div className="flex gap-2 mb-4">
@@ -703,8 +733,8 @@
                     </div>
 
                     <p className="mb-4 text-gray-600 text-center font-medium text-sm md:text-base">
-                        目標：將 <span className="font-mono text-blue-600 font-bold text-lg">{q.text}</span> 拼成一個完美的長方形！<br/>
-                        請將 {q.b} 個 x 積木，分配到右邊與下面。
+                        {t.ch3.level1Target} <span className="font-mono text-blue-600 font-bold text-lg">{q.text}</span> {t.ch3.level1TargetEnd}<br/>
+                        {t.ch3.distributePrompt ? t.ch3.distributePrompt.replace('{b}', q.b) : ''}
                     </p>
                     
                     {/* 2. 關鍵修改：提早在 md 斷點並排 (md:flex-row)，並改為 items-start 節省垂直空間 */}
@@ -747,7 +777,7 @@
                                          </div>
                                      ) : (
                                          <div className="w-full h-full flex items-center justify-center text-gray-400 font-bold text-sm">
-                                             缺 {m * n} 塊
+                                             {t.ch3.missingBlocks ? t.ch3.missingBlocks.replace('{count}', m * n) : ''}
                                          </div>
                                      )}
                                 </div>
@@ -758,14 +788,14 @@
                         <div className="flex-1 bg-white p-4 md:p-5 rounded-lg shadow w-full">
                             <div className="mb-4">
                                 <label className="block text-gray-700 font-bold mb-3 text-sm md:text-base">
-                                    分配 <span className="text-green-600">{q.b} 個 x</span> 的位置：
+                                    {t.ch3.distributeLabel ? t.ch3.distributeLabel.replace('{b}', q.b) : ''}
                                 </label>
                                 <div className="flex items-center gap-3 mb-3">
-                                    <span className="w-20 text-right text-gray-600 font-bold text-sm">放右邊：{m}</span>
+                                    <span className="w-20 text-right text-gray-600 font-bold text-sm">{t.ch3.placeRight} {m}</span>
                                     <input type="range" min="1" max={q.b - 1} value={m} onChange={(e) => setM(parseInt(e.target.value))} className="flex-1 cursor-pointer accent-green-500" />
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    <span className="w-20 text-right text-gray-600 font-bold text-sm">放下面：{n}</span>
+                                    <span className="w-20 text-right text-gray-600 font-bold text-sm">{t.ch3.placeBottom} {n}</span>
                                     <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
                                         <div className="h-full bg-green-300 block-transition" style={{ width: `${(n/q.b)*100}%` }}></div>
                                     </div>
@@ -773,17 +803,17 @@
                             </div>
 
                             <div className="bg-gray-50 p-3 rounded-xl border border-gray-200 mb-4 font-mono text-sm md:text-base text-center">
-                                右下角的缺口面積 = {m} × {n} = <span className={isSuccess ? "text-green-600 font-bold text-xl" : "text-red-500 font-bold text-xl"}>{m * n}</span>
+                                右下角的缺口{t.ch2.areaFormulaText} {m} × {n} = <span className={isSuccess ? "text-green-600 font-bold text-xl" : "text-red-500 font-bold text-xl"}>{m * n}</span>
                             </div>
 
                             {isSuccess ? (
                                 <div className="bg-green-50 border border-green-300 p-3 rounded-lg pop-in">
-                                    <p className="text-green-800 font-bold text-base mb-1">🎉 完美填滿 {q.c} 塊！</p>
-                                    <p className="text-green-700 text-xs md:text-sm">所以 <span className="font-mono font-bold">{q.text}</span> 分解後，長寬為：<br/><span className="font-mono font-bold text-sm bg-green-200 px-2 py-1 mt-1 inline-block rounded">(x + {m})(x + {n})</span></p>
+                                    <p className="text-green-800 font-bold text-base mb-1">{t.ch3.successFilled ? t.ch3.successFilled.replace('{c}', q.c) : ''}</p>
+                                    <p className="text-green-700 text-xs md:text-sm">{t.ch3.successFactored ? t.ch3.successFactored.replace('{text}', q.text) : ''}<br/><span className="font-mono font-bold text-sm bg-green-200 px-2 py-1 mt-1 inline-block rounded">(x + {m})(x + {n})</span></p>
                                 </div>
                             ) : (
                                 <div className="bg-yellow-50 border border-yellow-300 p-3 rounded-lg">
-                                    <p className="text-yellow-800 font-bold text-xs md:text-sm">💡 缺口面積必須剛好等於常數項 ({q.c})，才能拼成一個完整的長方形喔！</p>
+                                    <p className="text-yellow-800 font-bold text-xs md:text-sm">{t.ch3.gapHint ? t.ch3.gapHint.replace('{c}', q.c) : ''}</p>
                                 </div>
                             )}
                         </div>
@@ -792,7 +822,7 @@
             );
         };
 
-        const Chapter3Level2 = () => {
+        const Chapter3Level2 = ({ t }) => {
             const questions = [
                 { b: -1, c: -6, text: "x² - x - 6" },
                 { b: -5, c: 4, text: "x² - 5x + 4" },
@@ -819,7 +849,7 @@
 
             return (
                 <div className="flex flex-col items-center p-4">
-                    <h3 className="text-xl font-bold mb-4 text-gray-700">關卡二：數位黑板（真實十字還原）</h3>
+                    <h3 className="text-xl font-bold mb-4 text-gray-700">{t.ch3.level2Title}</h3>
                     
                     {/* 題庫切換器 */}
                     <div className="flex gap-2 mb-6">
@@ -835,9 +865,9 @@
                     </div>
 
                     <p className="mb-6 text-gray-600 text-center font-medium">
-                        這次有負數了！請模仿在紙上算數學的直覺：<br/>
+                        {t.ch3.level2Intro1}<br/>
                         找出兩個數字，讓它們<span className="text-red-500 font-bold">直的相乘</span>等於常數項，<span className="text-blue-500 font-bold">交叉相乘</span>的和等於一次項。<br/>
-                        目標：<span className="font-mono text-purple-600 font-bold text-xl tracking-widest">{q.text}</span>
+                        {t.ch3.targetLabel} <span className="font-mono text-purple-600 font-bold text-xl tracking-widest">{q.text}</span>
                     </p>
 
                     <div className="flex flex-col md:flex-row gap-8 items-center w-full max-w-5xl">
@@ -885,16 +915,16 @@
                         {/* 右側：計算過程反饋 */}
                         <div className="flex-1 w-full space-y-4">
                             <div className="bg-white p-6 rounded-xl shadow border border-gray-200">
-                                <h4 className="text-gray-500 font-bold text-sm mb-4 border-b pb-2">黑板演算過程</h4>
+                                <h4 className="text-gray-500 font-bold text-sm mb-4 border-b pb-2">{t.ch3.blackboardTitle}</h4>
                                 
                                 <div className="space-y-6">
                                     {/* 常數項檢驗 */}
                                     <div>
                                         <div className="flex justify-between items-center mb-1">
                                             <span className="text-red-600 font-bold flex items-center">
-                                                <span className="mr-2">↓</span> 直的相乘 (常數項)
+                                                <span className="mr-2">↓</span> {t.ch3.verticalMultiply}
                                             </span>
-                                            <span className="text-gray-400 text-sm">目標: {q.c}</span>
+                                            <span className="text-gray-400 text-sm">{t.ch3.targetSub} {q.c}</span>
                                         </div>
                                         <div className="bg-gray-50 p-3 rounded font-mono flex items-center justify-between text-lg">
                                             <span>({p}) × ({qVal}) = </span>
@@ -908,9 +938,9 @@
                                     <div>
                                         <div className="flex justify-between items-center mb-1">
                                             <span className="text-blue-600 font-bold flex items-center">
-                                                <span className="mr-2">╳</span> 交叉相乘再相加 (一次項)
+                                                <span className="mr-2">╳</span> {t.ch3.crossMultiply}
                                             </span>
-                                            <span className="text-gray-400 text-sm">目標: {q.b}x</span>
+                                            <span className="text-gray-400 text-sm">{t.ch3.targetSub} {q.b}x</span>
                                         </div>
                                         <div className="bg-gray-50 p-3 rounded font-mono flex items-center justify-between text-lg">
                                             <span>{p}x + {qVal}x = </span>
@@ -925,14 +955,14 @@
                             <div className={`p-4 rounded-xl shadow text-center block-transition border-2 ${isSolved ? 'bg-green-100 border-green-400' : 'bg-gray-100 border-gray-300'}`}>
                                 {isSolved ? (
                                     <div className="pop-in">
-                                        <h4 className="text-green-800 font-bold text-xl mb-2">✅ 十字交乘成功！</h4>
+                                        <h4 className="text-green-800 font-bold text-xl mb-2">{t.ch3.successCross}</h4>
                                         <p className="text-green-700 font-mono text-lg bg-white inline-block px-4 py-2 rounded shadow-sm">
                                             (x {p > 0 ? `+ ${p}` : `- ${Math.abs(p)}`})(x {qVal > 0 ? `+ ${qVal}` : `- ${Math.abs(qVal)}`})
                                         </p>
                                     </div>
                                 ) : (
                                     <div className="text-gray-500 font-bold">
-                                        {currentC === q.c ? "常數項對了！但交叉相乘後的一次項不對喔，再試試！" : "常數項還沒湊出來喔！"}
+                                        {currentC === q.c ? t.ch3.hintLinearWrong : t.ch3.hintConstantWrong}
                                     </div>
                                 )}
                             </div>
@@ -942,24 +972,24 @@
             );
         };
 
-        const Chapter3App = ({ onBack }) => {
+        const Chapter3App = ({ onBack, lang, setLang, t }) => {
             const [activeTab, setActiveTab] = useState(1);
 
             return (
                 <div className="max-w-4xl mx-auto p-4 md:p-8">
                     <div className="flex items-center justify-between mb-6">
                         <button onClick={onBack} className="text-blue-600 hover:text-blue-800 flex items-center font-semibold transition-colors">
-                            <span>← 返回目錄</span>
+                            <span>{t.backToMenu}</span>
                         </button>
-                        <h2 className="text-2xl font-bold text-gray-800">CH3 因式分解</h2>
-                        <div className="w-20"></div>
+                        <h2 className="text-xl md:text-2xl font-bold text-gray-800">{t.ch3 ? t.ch3.title : "CH3"}</h2>
+                        <LanguageSelector currentLang={lang} onSelectLang={setLang} />
                     </div>
 
                     <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
                         <div className="flex border-b border-gray-200 bg-gray-50 overflow-x-auto">
                             {[
-                                { id: 1, name: '關卡一：面積拼圖' }, 
-                                { id: 2, name: '關卡二：密碼鎖' }
+                                { id: 1, name: t.ch3.tab1 }, 
+                                { id: 2, name: t.ch3.tab2 }
                             ].map(tab => (
                                 <button
                                     key={tab.id}
@@ -976,8 +1006,8 @@
                         </div>
 
                         <div className="p-6 bg-white min-h-[400px]">
-                            {activeTab === 1 && <Chapter3Level1 />}
-                            {activeTab === 2 && <Chapter3Level2 />}
+                            {activeTab === 1 && <Chapter3Level1 t={t} />}
+                            {activeTab === 2 && <Chapter3Level2 t={t} />}
                         </div>
                     </div>
                 </div>
@@ -985,18 +1015,26 @@
         };
 
         const App = () => {
-            const [currentView, setCurrentView] = useState('menu'); 
+            const [currentView, setCurrentView] = useState('menu');
+            const [lang, setLang] = useState('zh');
+            const t = (window.TRANSLATIONS && window.TRANSLATIONS[lang]) || (window.TRANSLATIONS && window.TRANSLATIONS.zh) || {};
+
+            useEffect(() => {
+                if (t && t.siteTitle) {
+                    document.title = t.siteTitle;
+                }
+            }, [lang, t]);
 
             return (
                 <div className="font-sans">
                     {currentView === 'menu' ? (
-                        <MainMenu onSelectChapter={(id) => setCurrentView(id)} />
+                        <MainMenu onSelectChapter={(id) => setCurrentView(id)} lang={lang} setLang={setLang} t={t} />
                     ) : currentView === 'ch1' ? (
-                        <Chapter1App onBack={() => setCurrentView('menu')} />
+                        <Chapter1App onBack={() => setCurrentView('menu')} lang={lang} setLang={setLang} t={t} />
                     ) : currentView === 'ch2' ? (
-                        <Chapter2App onBack={() => setCurrentView('menu')} />
+                        <Chapter2App onBack={() => setCurrentView('menu')} lang={lang} setLang={setLang} t={t} />
                     ) : currentView === 'ch3' ? (
-                        <Chapter3App onBack={() => setCurrentView('menu')} />
+                        <Chapter3App onBack={() => setCurrentView('menu')} lang={lang} setLang={setLang} t={t} />
                     ) : null}
                 </div>
             );
