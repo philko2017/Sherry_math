@@ -1409,6 +1409,8 @@ const App = () => {
                         <Chapter2App onBack={() => setCurrentView('menu')} lang={lang} setLang={setLang} t={t} />
                     ) : currentView === 'ch3' ? (
                         <Chapter3App onBack={() => setCurrentView('menu')} lang={lang} setLang={setLang} t={t} />
+                    ) : currentView === 'ch4' ? (
+                        <Chapter4App onBack={() => setCurrentView('menu')} lang={lang} setLang={setLang} t={t} />
                     ) : null}
                 </div>
             );
